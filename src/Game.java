@@ -19,9 +19,11 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 		world.open("test.map");
 		
 		player = new Entity(world, 5, 5);
+		world.addEntity(player);
 	}
 	
 	public void update() {
+		world.update();
 		player.update();
 	}
 	
@@ -41,7 +43,11 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 		Point pos = world.pixel2coord(m.getX(), m.getY());
 		
 		if (m.getButton() == MouseEvent.BUTTON3) {
-			player.setTarget(new Point(m.getX(), m.getY()));
+			try {
+				player.setTarget(new Point(m.getX(), m.getY()));
+			} catch (InvalidPathException e) {
+				e.printStackTrace();
+			}
 		} else {
 			int id = world.getBlockAt(pos.x, pos.y);
 			if (id == 0) {
@@ -54,31 +60,56 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 	
 	
 	@Override
-	public void keyReleased(KeyEvent e) {
-		System.out.println(e.getKeyCode());
-		
+	public void keyReleased(KeyEvent e) {		
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			if (++currBlock > 2) {
 				currBlock = 1;
 			}
 		}
+		
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_W:
+		case KeyEvent.VK_S:
+			player.dy = 0;
+			break;
+		case KeyEvent.VK_D:
+		case KeyEvent.VK_A:
+			player.dx = 0;
+			break;
+		}
+	}
+	
+	public void keyPressed(KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_W:
+			player.dy = -2;
+			break;
+		case KeyEvent.VK_S:
+			player.dy = 2;
+			break;
+		case KeyEvent.VK_D:
+			player.dx = 2;
+			break;
+		case KeyEvent.VK_A:
+			player.dx = -2;
+			break;
+		}
 	}
 
 
 	// Fuck u java
-	public void windowActivated(WindowEvent e) {}
-	public void windowClosed(WindowEvent e) {}
+	public void windowActivated(WindowEvent e)   {}
+	public void windowClosed(WindowEvent e)      {}
 	public void windowDeactivated(WindowEvent e) {}
 	public void windowDeiconified(WindowEvent e) {}
-	public void windowIconified(WindowEvent e) {}
-	public void windowOpened(WindowEvent e) {}
-	public void mouseEntered(MouseEvent arg0) {}
-	public void mouseExited(MouseEvent arg0) {}
-	public void mousePressed(MouseEvent arg0) {}
-	public void mouseReleased(MouseEvent arg0) {}
-	public void keyPressed(KeyEvent e) {}
-	public void keyTyped(KeyEvent e) {}
-	public void mouseDragged(MouseEvent arg0) {}
-	public void mouseMoved(MouseEvent arg0) {}
+	public void windowIconified(WindowEvent e)   {}
+	public void windowOpened(WindowEvent e)      {}
+	public void mouseEntered(MouseEvent arg0)    {}
+	public void mouseExited(MouseEvent arg0)     {}
+	public void mousePressed(MouseEvent arg0)    {}
+	public void mouseReleased(MouseEvent arg0)   {}
+	public void keyTyped(KeyEvent e)             {}
+	public void mouseDragged(MouseEvent arg0)    {}
+	public void mouseMoved(MouseEvent arg0)      {}
 
 }

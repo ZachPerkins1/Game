@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,9 +38,105 @@ public class World {
 	}
 	
 	public void processCollisions() {
-		
+		for (Entity e : entities) {
+			double sx = 0;
+			double sy = 0;
+			double x = e.x;
+			double y = e.y;
+			
+			double ty = y + e.dy;
+			double tx = x + e.dx;
+			
+			if (Math.abs(e.dx) > Math.abs(e.dy)) {
+				sx = relativeMin(e.dx, blockSize);
+				sy = (e.dy/e.dx) * sx;
+			} else if (e.dy != 0) {
+				sy = relativeMin(e.dy, blockSize);
+				sx = (e.dx/e.dy) * sy;
+			}
+									
+			while (sx != 0 || sy != 0) {		
+				x += relativeMin(sx, Math.abs(x - (e.x + e.dx)));
+				y += relativeMin(sy, Math.abs(y - (e.y + e.dy)));
+				
+				if (isColliding(x, y, e.getW(), e.getH())) {
+					x -= sx;
+					y -= sy;
+					
+					int fx = (int) relativeMin(sx, 1);
+					int fy = (int) relativeMin(sy, 1);
+					
+					boolean success = false;
+					while (!success) {
+						x += fx;
+						if (isColliding(x, y, e.getW(), e.getH())) {
+							sx = 0;
+							x -= fx;
+							success = true;
+						} else {
+							y += fy;
+							if (isColliding(x, y, e.getW(), e.getH())) {
+								sy = 0;
+								y -= fy;
+								success = true;
+							}
+						}
+					}
+				}
+				
+				if ((x == tx || sx == 0) && (y == ty || sy == 0))
+					break;
+			}
+			
+			e.x = (int) x;
+			e.y = (int) y;
+		}
 	}
-
+	
+	// TODO: create another version of this that takes a collision event
+	private boolean isColliding(double x, double y, int width, int height) {
+		x = (x - (width / 2));
+		y = (y - (height / 2));
+				
+		int bx = (int) x / blockSize;
+		int by = (int) y / blockSize;
+		int bw = (int) (width + (x % blockSize)) / blockSize + 1;
+		int bh = (int) (height + (y % blockSize)) / blockSize + 1;
+						
+		for (int i = bx; i < bx + bw; i++) {
+			for (int j = by; j < by + bh; j++) {
+				if (Statics.COL[map[i][j]]) {
+					int px = i * blockSize;
+					int py = j * blockSize;
+					
+					if (new Rectangle(px, py, blockSize, blockSize).intersects(new Rectangle((int)x, (int)y, width, height))) {
+						return true;
+					}
+				}	
+			}
+		}
+		
+		return false;
+	}
+	
+	private double relativeMax(double a, double b) {
+		if (a < 0) {
+			b = -b;
+			return Math.min(a, b);
+		}
+		
+		return Math.max(a, b);
+	}
+	
+	private double relativeMin(double a, double b) {
+		if (a < 0) {
+			b = -b;
+			return Math.max(a, b);
+		}
+		
+		return Math.min(a, b);
+	}
+	
 	public void placeBlock(int x, int y, int id) {
 		map[x][y] = (byte)id;
 		if (eMap[x][y] != null) {
@@ -163,5 +260,7 @@ public class World {
 					eMap[x][y].update();
 			}
 		}
+		
+		processCollisions();
 	}
 }

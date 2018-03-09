@@ -5,12 +5,12 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 
 public class Entity {
-	private static final int AUTO_MOVE_SPEED = 2;
+	private static final double AUTO_MOVE_SPEED = 2;
 	
-	private int x;
-	private int y;
-	private int dx;
-	private int dy;
+	public int x;
+	public int y;
+	public double dx;
+	public double dy;
 	
 	// width/height
 	private int w;
@@ -25,15 +25,14 @@ public class Entity {
 	
 	private boolean hasCollided;
 	
-	private Point target;
-	private Point pTarget;
+	private Point pTarget; // The target block in pixels
 	
 
 	public Entity(World world, int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.w = world.blockSize;
-		this.h = world.blockSize;
+		this.w = world.blockSize - 6;
+		this.h = world.blockSize - 6;
 		this.world = world;
 		
 		this.hasCollided = false;
@@ -56,18 +55,14 @@ public class Entity {
 	public void update() {
 		if (autoMove) 
 			autoMove = autoMove();
-		
-		y += dy;
-		x += dx;
 	}
 	
-	public void setTarget(Point target) {
+	public void setTarget(Point target) throws InvalidPathException {
 		if (!target.equals(this.pTarget)) {
 			this.pTarget = target;
-			this.target = new Point(target.x/world.blockSize, target.y/world.blockSize);
 			
 			// Convert the path to an array
-			path = pathFind().toArray(new Point[0]);
+			path = pathFind(new Point(target.x/world.blockSize, target.y/world.blockSize)).toArray(new Point[0]);
 			pathLen = path.length;
 			currentTarget = 0;
 			autoMove = true;
@@ -118,9 +113,13 @@ public class Entity {
 	}
 	
 	// Use A* to calculate a new path for the entity. Stores it in path variable.
-	private ArrayList<Point> pathFind() {
+	private ArrayList<Point> pathFind(Point target) throws InvalidPathException {
 		int gx = x/world.blockSize;
 		int gy = y/world.blockSize;
+		
+		// Check to see if the block we're trying to get to is collidable
+		if (Statics.COL[world.getBlockAt(target)]) 
+			throw new InvalidPathException(target);
 		
 		APointList openList = new APointList();
 		APointList closedList = new APointList();
@@ -130,7 +129,13 @@ public class Entity {
 		while (!current.equals(target)) {
 			//System.out.println(current);
 			openList.addSurrounding(world, current, closedList, target);
-			current = openList.getLowest();
+			
+			try {
+				current = openList.getLowest();
+			} catch (IndexOutOfBoundsException e) {
+				throw new InvalidPathException();
+			}
+			
 			openList.remove(current);
 			closedList.n_add(current);
 		}
@@ -159,5 +164,13 @@ public class Entity {
 		}
 				
 		return f;
+	}
+	
+	public int getW() {
+		return w;
+	}
+	
+	public int getH() {
+		return h;
 	}
 }
