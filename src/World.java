@@ -8,6 +8,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class World {
+	public static double EPSILON = 0.5;
+	
+	private Camera cam;
+	
 	public int blockSize;
 	private int width;
 	private int height;
@@ -20,6 +24,7 @@ public class World {
 	public World(int width, int height) {
 		this.width = width;
 		this.height = height;
+		cam = new Camera();
 		
 		createMap();
 	}
@@ -37,6 +42,7 @@ public class World {
 		entities.add(e);
 	}
 	
+	// Process collision
 	public void processCollisions() {
 		for (Entity e : entities) {
 			double sx = 0;
@@ -46,7 +52,7 @@ public class World {
 			
 			double ty = y + e.dy;
 			double tx = x + e.dx;
-			
+						
 			if (Math.abs(e.dx) > Math.abs(e.dy)) {
 				sx = relativeMin(e.dx, blockSize);
 				sy = (e.dy/e.dx) * sx;
@@ -54,8 +60,9 @@ public class World {
 				sy = relativeMin(e.dy, blockSize);
 				sx = (e.dx/e.dy) * sy;
 			}
-									
-			while (sx != 0 || sy != 0) {		
+			
+			
+			while (!((equals(x, tx) || sx == 0) && (equals(y, ty) || sy == 0))) {		
 				x += relativeMin(sx, Math.abs(x - (e.x + e.dx)));
 				y += relativeMin(sy, Math.abs(y - (e.y + e.dy)));
 				
@@ -63,9 +70,10 @@ public class World {
 					x -= sx;
 					y -= sy;
 					
-					int fx = (int) relativeMin(sx, 1);
-					int fy = (int) relativeMin(sy, 1);
-					
+					double divisor = Math.ceil(Math.max(Math.abs(sx), Math.abs(sy)));
+					double fx = sx / divisor;
+					double fy = sy / divisor;
+										
 					boolean success = false;
 					while (!success) {
 						x += fx;
@@ -73,7 +81,8 @@ public class World {
 							sx = 0;
 							x -= fx;
 							success = true;
-						} else {
+						}
+						else {
 							y += fy;
 							if (isColliding(x, y, e.getW(), e.getH())) {
 								sy = 0;
@@ -83,33 +92,30 @@ public class World {
 						}
 					}
 				}
-				
-				if ((x == tx || sx == 0) && (y == ty || sy == 0))
-					break;
 			}
-			
-			e.x = (int) x;
-			e.y = (int) y;
+						
+			e.x = (int) Math.round(x);
+			e.y = (int) Math.round(y);
 		}
 	}
 	
 	// TODO: create another version of this that takes a collision event
 	private boolean isColliding(double x, double y, int width, int height) {
-		x = (x - (width / 2));
-		y = (y - (height / 2));
+		double ax = (x - (width / 2));
+		double ay = (y - (height / 2));
 				
-		int bx = (int) x / blockSize;
-		int by = (int) y / blockSize;
-		int bw = (int) (width + (x % blockSize)) / blockSize + 1;
-		int bh = (int) (height + (y % blockSize)) / blockSize + 1;
+		int bx = (int) ax / blockSize;
+		int by = (int) ay / blockSize;
+		int bw = (int) (width + (ax % blockSize)) / blockSize;
+		int bh = (int) (height + (ay % blockSize)) / blockSize;
 						
-		for (int i = bx; i < bx + bw; i++) {
-			for (int j = by; j < by + bh; j++) {
-				if (Statics.COL[map[i][j]]) {
+		for (int i = bx; i <= bx + bw; i++) {
+			for (int j = by; j <= by + bh; j++) {
+				if (isSolid(i, j)) {
 					int px = i * blockSize;
 					int py = j * blockSize;
 					
-					if (new Rectangle(px, py, blockSize, blockSize).intersects(new Rectangle((int)x, (int)y, width, height))) {
+					if (new Rectangle(px, py, blockSize, blockSize).intersects(new Rectangle((int)Math.round(ax), (int)Math.round(ay), width, height))) {
 						return true;
 					}
 				}	
@@ -119,15 +125,7 @@ public class World {
 		return false;
 	}
 	
-	private double relativeMax(double a, double b) {
-		if (a < 0) {
-			b = -b;
-			return Math.min(a, b);
-		}
-		
-		return Math.max(a, b);
-	}
-	
+	// Utility method for collisions
 	private double relativeMin(double a, double b) {
 		if (a < 0) {
 			b = -b;
@@ -135,6 +133,10 @@ public class World {
 		}
 		
 		return Math.min(a, b);
+	}
+	
+	private boolean equals(double a, double b) {
+		return a > b - EPSILON && a < b + EPSILON;
 	}
 	
 	public void placeBlock(int x, int y, int id) {
@@ -145,7 +147,7 @@ public class World {
 		
 		
 		if (Statics.BEN[id] != null) {
-			eMap[x][y] = Statics.BEN[id].create(x, y, blockSize);
+			eMap[x][y] = Statics.BEN[id].create(x, y, this);
 		} else {
 			eMap[x][y] = null;
 		}
@@ -226,6 +228,10 @@ public class World {
 		return x;
 	}
 	
+	public Camera getCamera() {
+		return cam;
+	}
+	
 	// Take individual bytes out of an int and shove them into an arr at
 	// start
 	private void intToArr(int n, byte[] arr, int start) {
@@ -244,12 +250,16 @@ public class World {
 				Color c = Statics.TEX[id];
 				if (c != null) {
 					g.setColor(c);
-					g.fillRect(x*blockSize, y*blockSize, blockSize, blockSize);
+					g.fillRect(cam.getAX(x*blockSize), cam.getAY(y*blockSize), blockSize, blockSize);
 				}
 				if (e != null) {
-					e.draw(g);
+					e.draw(g, cam);
 				}
 			}
+		}
+		
+		for (Entity e : entities) {
+			e.draw(g, cam);
 		}
 	}
 	
@@ -262,5 +272,7 @@ public class World {
 		}
 		
 		processCollisions();
+		
+		cam.update();
 	}
 }

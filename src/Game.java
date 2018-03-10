@@ -9,27 +9,59 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 public class Game implements WindowListener, MouseListener, MouseMotionListener, KeyListener {
+	private static final int RIGHT = 0;
+	private static final int DOWN = 1;
+	private static final int LEFT = 2;
+	private static final int UP = 3;
+	
+	private boolean[] movement;
+	
 	private World world;
 	private Entity player;
 	
 	private int currBlock = 1;
 	
+	
 	public Game() {
+		movement = new boolean[4];
+		
 		world = new World(50, 50);
 		world.open("test.map");
 		
-		player = new Entity(world, 5, 5);
+		player = new Entity(world, 200, 200);
 		world.addEntity(player);
+		world.getCamera().setFollowing(player);
 	}
 	
 	public void update() {
+		if (!player.hasTarget())
+			player.zero();
+		
+		for (int i = 0; i < 4; i++) {
+			if (movement[i]) {
+				player.cancelTarget();
+				
+				double m = 3;
+				
+				if (movement[(i+3) % 4] || movement[(i+1) % 4])
+					m = 2.1;
+				
+				if (i > 1)
+					m = -m;
+				
+				if (i % 2 == 0) 
+					player.dx += m;
+				else
+					player.dy += m;	
+			}
+		}
+						
 		world.update();
 		player.update();
 	}
 	
 	public void draw(Graphics2D g) {
 		world.draw(g);
-		player.draw(g);
 	}
 	
 	@Override
@@ -69,12 +101,16 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 		
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
+			movement[UP] = false;
+			break;
 		case KeyEvent.VK_S:
-			player.dy = 0;
+			movement[DOWN] = false;
 			break;
 		case KeyEvent.VK_D:
+			movement[RIGHT] = false;
+			break;
 		case KeyEvent.VK_A:
-			player.dx = 0;
+			movement[LEFT] = false;
 			break;
 		}
 	}
@@ -82,20 +118,19 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
-			player.dy = -2;
+			movement[UP] = true;
 			break;
 		case KeyEvent.VK_S:
-			player.dy = 2;
+			movement[DOWN] = true;
 			break;
 		case KeyEvent.VK_D:
-			player.dx = 2;
+			movement[RIGHT] = true;
 			break;
 		case KeyEvent.VK_A:
-			player.dx = -2;
+			movement[LEFT] = true;
 			break;
 		}
 	}
-
 
 	// Fuck u java
 	public void windowActivated(WindowEvent e)   {}

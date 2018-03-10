@@ -4,7 +4,7 @@ public abstract class BlockEntity {
 	protected final int _ID;
 	private int x;
 	private int y;
-	private int p;
+	private World world;
 	
 	public BlockEntity(int id) {
 		_ID = id;
@@ -16,7 +16,7 @@ public abstract class BlockEntity {
 	public abstract void remove();
 	
 	public void update() {}
-	public void draw(Graphics2D g) {}
+	public void draw(Graphics2D g, Camera c) {}
 	
 	public int getX() {
 		return x;
@@ -27,26 +27,26 @@ public abstract class BlockEntity {
 	}
 	
 	public int getPixels() {
-		return p;
+		return world.blockSize;
 	}
 	
 	public int getPX() {
-		return p*x;
+		return world.blockSize*x;
 	}
 	
 	public int getPY() {
-		return p*y;
+		return world.blockSize*y;
 	}
 	
 	public BlockEntity getNew() {
 		return null;
 	}
 	
-	public BlockEntity create(int x, int y, int p) {
+	public BlockEntity create(int x, int y, World w) {
 		BlockEntity e = getNew();
 		e.x = x;
 		e.y = y;
-		e.p = p;
+		e.world = w;
 		return e;
 	}
 	

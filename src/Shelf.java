@@ -41,10 +41,10 @@ public class Shelf extends BlockEntity {
 	}
 	
 	@Override
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, Camera c) {
 		for (ItemStack item : i) {
 			g.setColor(item.getTexture());
-			g.fillOval(getPX(), getPY(), 10, 10);
+			g.fillOval(c.getAX(getPX()), c.getAY(getPY()), 10, 10);
 		}
 	}
 

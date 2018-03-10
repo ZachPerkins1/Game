@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 
 public class Entity {
@@ -38,18 +37,18 @@ public class Entity {
 		this.hasCollided = false;
 	}
 	
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, Camera c) {
 		g.setColor(Color.BLUE);
 
 //		pathfind debug code
 //
 //		for (int i = 0; i < pathLen; i++) {
-//			Point p = path[i];
+//			Point p = path[i];s
 //			g.fillRect(p.x, p.y, world.blockSize, world.blockSize);
 //		}
 		
 		g.setColor(Color.RED);
-		g.fillOval(x - w/2, y - h/2, w, h);
+		g.fillOval(c.getAX(x - w/2), c.getAY(y - h/2), w, h);
 	}
 	
 	public void update() {
@@ -67,6 +66,17 @@ public class Entity {
 			currentTarget = 0;
 			autoMove = true;
 		}
+	}
+	
+	public void cancelTarget() {
+		if (autoMove) {
+			autoMove = false;
+			zero();
+		}
+	}
+	
+	public boolean hasTarget() {
+		return autoMove;
 	}
 	
 	// Set the velocity of the entity to be what it needs to be to get to the next
@@ -172,5 +182,10 @@ public class Entity {
 	
 	public int getH() {
 		return h;
+	}
+	
+	public void zero() {
+		dx = 0;
+		dy = 0;
 	}
 }
