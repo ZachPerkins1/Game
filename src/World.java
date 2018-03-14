@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -24,13 +23,6 @@ public class World {
 		entities = new ArrayList<Entity>();
 	}
 	
-	private void create() {
-		// int minChunkX = cam.getX() / Chunk.P_SIZE;
-		// int maxChunkX = cam.getMaxX() / Chunk.P_SIZE;
-		// int minChunkY = cam.getY() / Chunk.P_SIZE;
-		// int maxChunkY = cam.getMaxY() / Chunk.P_SIZE;	
-	}
-	
 	private Chunk getChunk(int x, int y) {
 		Chunk c = chunks.at(x, y);
 		
@@ -51,9 +43,6 @@ public class World {
 				
 		Chunk chunk = getChunk(c.x, c.y);
 		chunk.place(ox, oy, id);
-		
-		System.out.println(c);
-		System.out.println(x);
 	}
 	
 	public int blockAt(int x, int y) {
@@ -101,13 +90,14 @@ public class World {
 					double divisor = Math.ceil(Math.max(Math.abs(sx), Math.abs(sy)));
 					double fx = sx / divisor;
 					double fy = sy / divisor;
-										
+															
 					boolean success = false;
 					while (!success) {
 						x += fx;
 						if (isColliding(x, y, e.getW(), e.getH())) {
 							sx = 0;
 							x -= fx;
+							x = Math.round(x);
 							success = true;
 						}
 						else {
@@ -115,6 +105,7 @@ public class World {
 							if (isColliding(x, y, e.getW(), e.getH())) {
 								sy = 0;
 								y -= fy;
+								y = Math.round(y);
 								success = true;
 							}
 						}
@@ -122,8 +113,8 @@ public class World {
 				}
 			}
 						
-			e.x = (int) Math.round(x);
-			e.y = (int) Math.round(y);
+			e.x = x;
+			e.y = y;
 		}
 	}
 	
@@ -133,15 +124,11 @@ public class World {
 		double ax = (x - (width / 2));
 		double ay = (y - (height / 2));
 		
-		Point coords = pixel2coord((int)ax, (int)ay);
-		int bx = coords.x;
-		int by = coords.y;
+		Point min = pixel2coord(ax, ay);
+		Point max = pixel2coord(ax + width, ay + height);
 		
-		int bw = (int) Math.ceil((width + Math.abs(ax % BLOCK_SIZE)) / BLOCK_SIZE);
-		int bh = (int) Math.ceil((height + Math.abs(ay % BLOCK_SIZE)) / BLOCK_SIZE);
-		
-		for (int i = bx; i <= bx + bw; i++) {
-			for (int j = by; j <= by + bh; j++) {
+		for (int i = min.x; i <= max.x; i++) {
+			for (int j = min.y; j <= max.y; j++) {
 				if (isSolid(i, j)) {
 					if (new Rectangle(i*BLOCK_SIZE, j*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE).intersects(new Rectangle((int)Math.round(ax), (int)Math.round(ay), width, height))) {
 						return true;
@@ -177,9 +164,9 @@ public class World {
 		return null;
 	}
 	
-	public Point pixel2coord(int px, int py) {
-		int bx = px / BLOCK_SIZE;
-		int by = py / BLOCK_SIZE;
+	public Point pixel2coord(double px, double py) {
+		int bx = (int) (px / BLOCK_SIZE);
+		int by = (int) (py / BLOCK_SIZE);
 		
 		if (px < 0) bx--;
 		if (py < 0) by--;
@@ -221,32 +208,15 @@ public class World {
 		}
 		
 		int i = 4;
+		System.out.println(map.length);
 		while (i < map.length) {
 			int x = arrToInt(map, i);
 			int y = arrToInt(map, i + Integer.BYTES);
 			Chunk c = new Chunk(this, x, y);
+			System.out.println(c);
 			i = c.load(map, i + Integer.BYTES*2);
 			chunks.add(c);
 		}
-		
-//		try {
-//			
-//			
-//			System.out.
-//			createMap();
-//			
-//			for (int x = 0; x < width; x++) {
-//				for (int y = 0; y < height; y++) {
-//					this.placeBlock(x, y, map[x*width + y + 8]);
-//				}
-//			}
-//			
-//			
-//			
-//		} catch (IOException e) {
-//			System.out.println("Unable to open map " + filename);
-//		}
-		
 	}
 	
 	// Saves using the same process
@@ -264,22 +234,6 @@ public class World {
 		}
 		
 		stream.close();
-	
-//		byte[] raw = new byte[width*height + 8];
-//		intToArr(width, raw, 0);
-//		intToArr(height, raw, 4);
-//				
-//		for (int x = 0; x < width; x++) {
-//			for (int y = 0; y < height; y++) {
-//				raw[x*width + y + 8] = map[x][y];
-//			}
-//		}
-//		
-//		try {
-//			Files.write(Paths.get(filename), raw);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 	}
 	
 	// Take bytes out of an arr from start and convert them to int
@@ -307,11 +261,13 @@ public class World {
 	
 	// Called by window
 	public void draw(Graphics2D g) {
-		Point min = coord2chunk(cam.getX() / BLOCK_SIZE, cam.getY() / BLOCK_SIZE);
-		Point max = coord2chunk(cam.getMaxX() / BLOCK_SIZE, cam.getMaxY() / BLOCK_SIZE);
+		Point minP = pixel2coord(cam.getX(), cam.getY());
+		Point maxP = pixel2coord(cam.getMaxX(), cam.getMaxY());
+		Point minC = coord2chunk(minP.x, minP.y);
+		Point maxC = coord2chunk(maxP.x, maxP.y);
 		
-		for (int x = min.x; x <= max.x; x++) {
-			for (int y = min.y; y <= max.y; y++) {
+		for (int x = minC.x; x <= maxC.x; x++) {
+			for (int y = minC.y; y <= maxC.y; y++) {
 				getChunk(x, y).draw(g, cam);
 			}
 		}

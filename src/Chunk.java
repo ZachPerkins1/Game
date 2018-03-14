@@ -3,13 +3,14 @@ import java.awt.Graphics2D;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Chunk {
 	int x = 0;
 	int y = 0;
 	
 	public static int SIZE = 64;
-	public static int F_SIZE = (int) Math.pow((SIZE / Byte.SIZE), 2);
+	public static int F_SIZE = (int) Math.pow((SIZE), 2) / Byte.SIZE;
 	public static int P_SIZE = SIZE * World.BLOCK_SIZE;
 	
 	byte[][] blocks;
@@ -63,17 +64,17 @@ public class Chunk {
 			
 			for (int j = 0; j < 8; j++) {
 				int x = (o + j) / SIZE;
-				int y = SIZE - x;
+				int y = (o + j) % SIZE;
 				
-				if (((file[i] >> j) & 0x01) == 0x01) {
-					place(x, y, file[++end]);
+				if (((byte)(file[i] >> (7 - j)) & (byte) 0x01) == (byte)0x01) {
+					place(x, y, file[end++]);
 				} else {
 					blocks[x][y] = 0;
 				}
 			}
 		}
 		
-		return end + 1;
+		return end;
 	}
 	
 	// Save the chunk to a file
@@ -87,17 +88,17 @@ public class Chunk {
 			
 			for (int j = 0; j < 8; j++) {
 				int x = (o + j) / SIZE;
-				int y = SIZE - x;
+				int y = (o + j) % SIZE;
 				
 				int b = blockAt(x, y);
-				byte comparator = 0x00;
+				byte comparator = (byte)0x00;
 				
 				if (b != 0) {
 					blockList.add((byte)b);
-					comparator = 0x01;
+					comparator = (byte)0x01;
 				}
 				
-				buffer[i] = (byte) ((buffer[i] | comparator) << j == 7? 0: 1);
+				buffer[i] = (byte) ((buffer[i] | comparator) << (j == 7? 0: 1));
 			}
 		}
 		

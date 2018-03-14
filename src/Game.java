@@ -31,6 +31,7 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 		try {
 			world.open("a.map");
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -76,12 +77,11 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 	
 	@Override
 	public void windowClosing(WindowEvent e) {
-		//world.saveToFile("save.map");
-//		try {
-//			world.save("a.map");
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
+		try {
+			world.save("a.map");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -95,6 +95,7 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 				e.printStackTrace();
 			}
 		} else {
+			System.out.println(pos);
 			int id = world.blockAt(pos.x, pos.y);
 			System.out.println(id);
 			if (id == 0) {

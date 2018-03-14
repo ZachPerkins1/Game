@@ -7,8 +7,8 @@ import java.util.Arrays;
 public class Entity {
 	private static final double AUTO_MOVE_SPEED = 2;
 	
-	public int x;
-	public int y;
+	public double x;
+	public double y;
 	public double dx;
 	public double dy;
 	
@@ -94,8 +94,8 @@ public class Entity {
 			target = pTarget;
 		
 		if (target.x != x || target.y != y) {
-			int xDist = target.x - x;
-			int yDist = target.y - y;
+			int xDist = (int) (target.x - x);
+			int yDist = (int) (target.y - y);
 							 
 			if (yDist > 0) {
 				dy = Math.min(AUTO_MOVE_SPEED, yDist);

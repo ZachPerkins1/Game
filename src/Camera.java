@@ -42,7 +42,7 @@ public class Camera {
 	
 	public void setFollowing(Entity en) {
 		e = en;
-		setCenter(e.x, e.y);
+		setCenter((int)e.x, (int)e.y);
 	}
 	
 	public void cancelFollow() {
@@ -73,21 +73,21 @@ public class Camera {
 		}
 	}
 	
-	public int getAX(int rx) {
-		return rx - x;
+	public int getAX(double rx) {
+		return (int) (rx - x);
 	}
 	
-	public int getAY(int ry) {
-		return ry - y;
+	public int getAY(double ry) {
+		return (int) (ry - y);
 	}
 	
 	// given an adjusted x, get a normalized x
 	public int getX(int ax) {
-		return ax + x;
+		return (ax + x);
 	}
 	
 	public int getY(int ay) {
-		return ay + y;
+		return (ay + y);
 	}
 	
 	public int getX() {
