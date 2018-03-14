@@ -8,9 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class World {
-	public static double EPSILON = 0.5;
-	
+public class World {	
 	public static int BLOCK_SIZE = 32;
 	
 	private Camera cam;
@@ -79,7 +77,7 @@ public class World {
 			}
 			
 			
-			while (!((equals(x, tx) || sx == 0) && (equals(y, ty) || sy == 0))) {		
+			while (!((Util.equals(x, tx) || sx == 0) && (Util.equals(y, ty) || sy == 0))) {		
 				x += relativeMin(sx, Math.abs(x - (e.x + e.dx)));
 				y += relativeMin(sy, Math.abs(y - (e.y + e.dy)));
 				
@@ -150,13 +148,8 @@ public class World {
 		return Math.min(a, b);
 	}
 	
-	private boolean equals(double a, double b) {
-		return a > b - EPSILON && a < b + EPSILON;
-	}
-	
 	public boolean isSolid(int x, int y) {
 		return Statics.COL[blockAt(x, y)];
-		//return Statics.COL[getBlockAt(x, y)];
 	}
 	
 	public BlockEntity getEntityAt(int x, int y) {

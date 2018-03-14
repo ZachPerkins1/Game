@@ -93,9 +93,9 @@ public class Entity {
 		if (currentTarget == pathLen - 1)
 			target = pTarget;
 		
-		if (target.x != x || target.y != y) {
-			int xDist = (int) (target.x - x);
-			int yDist = (int) (target.y - y);
+		if (!Util.equals(x, target.x) || !Util.equals(y, target.y)) {
+			double xDist = (target.x - x);
+			double yDist = (target.y - y);
 							 
 			if (yDist > 0) {
 				dy = Math.min(AUTO_MOVE_SPEED, yDist);
