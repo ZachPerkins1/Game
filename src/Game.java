@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 
 public class Game implements WindowListener, MouseListener, MouseMotionListener, KeyListener {
 	private static final int RIGHT = 0;
@@ -17,6 +18,7 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 	private boolean[] movement;
 	
 	private World world;
+	private Camera c;
 	private Entity player;
 	
 	private int currBlock = 1;
@@ -25,24 +27,32 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 	public Game() {
 		movement = new boolean[4];
 		
-		world = new World(50, 50);
-		world.open("test.map");
+		world = new World();
+		try {
+			world.open("a.map");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		player = new Entity(world, 200, 200);
+		player = new Entity(world, 100, 300);
 		world.addEntity(player);
-		world.getCamera().setFollowing(player);
+		c = world.getCamera();
+		c.setFollowing(player);
 	}
 	
 	public void update() {
+		// Zero the speeds before we adjust them
 		if (!player.hasTarget())
 			player.zero();
 		
+		// Determine the new movement speed of the player
 		for (int i = 0; i < 4; i++) {
 			if (movement[i]) {
 				player.cancelTarget();
 				
 				double m = 3;
 				
+				//If there is movement in the x 
 				if (movement[(i+3) % 4] || movement[(i+1) % 4])
 					m = 2.1;
 				
@@ -67,25 +77,30 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 	@Override
 	public void windowClosing(WindowEvent e) {
 		//world.saveToFile("save.map");
-		world.save("test.map");
+//		try {
+//			world.save("a.map");
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent m) {
-		Point pos = world.pixel2coord(m.getX(), m.getY());
+		Point pos = world.pixel2coord(c.getX(m.getX()), c.getY(m.getY()));
 		
 		if (m.getButton() == MouseEvent.BUTTON3) {
 			try {
-				player.setTarget(new Point(m.getX(), m.getY()));
+				player.setTarget(new Point(c.getX(m.getX()), c.getY(m.getY())));
 			} catch (InvalidPathException e) {
 				e.printStackTrace();
 			}
 		} else {
-			int id = world.getBlockAt(pos.x, pos.y);
+			int id = world.blockAt(pos.x, pos.y);
+			System.out.println(id);
 			if (id == 0) {
-				world.placeBlock(pos.x, pos.y, currBlock);
+				world.place(pos.x, pos.y, currBlock);
 			} else {
-				world.placeBlock(pos.x, pos.y, 0);
+				world.place(pos.x, pos.y, 0);
 			}
 		}
 	}

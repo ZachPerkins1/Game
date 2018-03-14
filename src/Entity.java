@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Entity {
 	private static final double AUTO_MOVE_SPEED = 2;
@@ -30,8 +31,8 @@ public class Entity {
 	public Entity(World world, int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.w = world.blockSize - 6;
-		this.h = world.blockSize - 6;
+		this.w = World.BLOCK_SIZE - 6;
+		this.h = World.BLOCK_SIZE - 6;
 		this.world = world;
 		
 		this.hasCollided = false;
@@ -61,7 +62,8 @@ public class Entity {
 			this.pTarget = target;
 			
 			// Convert the path to an array
-			path = pathFind(new Point(target.x/world.blockSize, target.y/world.blockSize)).toArray(new Point[0]);
+			Point adjustedTarget = world.pixel2coord(target.x, target.y);
+			path = pathFind(new Point(adjustedTarget.x, adjustedTarget.y)).toArray(new Point[0]);
 			pathLen = path.length;
 			currentTarget = 0;
 			autoMove = true;
@@ -124,16 +126,15 @@ public class Entity {
 	
 	// Use A* to calculate a new path for the entity. Stores it in path variable.
 	private ArrayList<Point> pathFind(Point target) throws InvalidPathException {
-		int gx = x/world.blockSize;
-		int gy = y/world.blockSize;
+		Point g = world.pixel2coord(x, y);
 		
 		// Check to see if the block we're trying to get to is collidable
-		if (Statics.COL[world.getBlockAt(target)]) 
+		if (world.isSolid(g.x, g.y)) 
 			throw new InvalidPathException(target);
 		
 		APointList openList = new APointList();
 		APointList closedList = new APointList();
-		APoint current = new APoint(target, gx, gy);
+		APoint current = new APoint(target, g.x, g.y);
 		closedList.add(current);
 				
 		while (!current.equals(target)) {
@@ -156,17 +157,17 @@ public class Entity {
 		APoint d = null; // last point
 		
 		// Stores all the points such that only changes in direction are saved
-		while (!p.equals(new Point(gx, gy))) {
+		while (!p.equals(new Point(g.x, g.y))) {
 			if (d != null)  {
-				Point g = p.getParent();
+				Point z = p.getParent();
 				
 				// Check to see if there is a turn
-				if ((d.x == p.x && p.x != g.x) ||
-					(d.y == p.y && p.y != g.y)) {
-					f.add(0, p.getAdjusted(world.blockSize));
+				if ((d.x == p.x && p.x != z.x) ||
+					(d.y == p.y && p.y != z.y)) {
+					f.add(0, p.getAdjusted(World.BLOCK_SIZE));
 				}
 			} else {
-				f.add(0, p.getAdjusted(world.blockSize));
+				f.add(0, p.getAdjusted(World.BLOCK_SIZE));
 			}
 			
 			d = p;

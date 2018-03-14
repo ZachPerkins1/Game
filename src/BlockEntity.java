@@ -27,15 +27,15 @@ public abstract class BlockEntity {
 	}
 	
 	public int getPixels() {
-		return world.blockSize;
+		return World.BLOCK_SIZE;
 	}
 	
 	public int getPX() {
-		return world.blockSize*x;
+		return World.BLOCK_SIZE*x;
 	}
 	
 	public int getPY() {
-		return world.blockSize*y;
+		return World.BLOCK_SIZE*y;
 	}
 	
 	public BlockEntity getNew() {

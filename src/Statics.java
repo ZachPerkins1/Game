@@ -47,6 +47,4 @@ public class Statics {
 		TEX[ITM(0)] = Color.RED;
 		    IEN[0]  = new Apple(0);
 	}
-	
-	
 }
