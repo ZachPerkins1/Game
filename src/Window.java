@@ -12,8 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Window extends JPanel {
-	public static final int WIDTH = 1000;
-	public static final int HEIGHT = 1000;
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 800;
 	
 	public static void main(String[] args) {
 		Window w = new Window();
@@ -57,6 +57,6 @@ public class Window extends JPanel {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(Color.white);
 		g2d.fillRect(0, 0, WIDTH, HEIGHT);
-		game.draw(g2d);
+		//game.draw(g2d);
 	}
 }

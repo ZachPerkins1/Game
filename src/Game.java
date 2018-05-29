@@ -38,7 +38,7 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 		player = new Entity(world, 100, 300);
 		world.addEntity(player);
 		c = world.getCamera();
-		c.setFollowing(player);
+		//c.setFollowing(player);
 	}
 	
 	public void update() {
@@ -71,8 +71,8 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 		player.update();
 	}
 	
-	public void draw(Graphics2D g) {
-		world.draw(g);
+	public void draw() {
+		world.draw();
 	}
 	
 	@Override
@@ -96,7 +96,7 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 			}
 		} else {
 			System.out.println(pos);
-			int id = world.blockAt(pos.x, pos.y);
+			int id = world.blockAt(pos.x, pos.y).getID();
 			System.out.println(id);
 			if (id == 0) {
 				world.place(pos.x, pos.y, currBlock);
@@ -108,7 +108,7 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 	
 	
 	@Override
-	public void keyReleased(KeyEvent e) {		
+	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			if (++currBlock > 2) {
 				currBlock = 1;

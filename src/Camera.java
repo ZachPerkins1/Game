@@ -11,6 +11,10 @@ public class Camera {
 	
 	private Entity e = null;
 	
+	private float[] pos;
+	private static final int T_X = 3;
+	private static final int T_Y = 7;
+	
 	public Camera(int x, int y, int sWidth, int sHeight) {
 		this.x = x;
 		this.y = y;
@@ -20,6 +24,13 @@ public class Camera {
 		w = sWidth;
 		fw = 200;
 		fh = 200;
+		
+		pos = new float[] {
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+		};
 	}
 	
 	public Camera(int sWidth, int sHeight) {
@@ -31,8 +42,13 @@ public class Camera {
 	}
 	
 	public void setCenter(int cx, int cy) {
-		x = cx - (w / 2);
-		y = cy - (h / 2);
+		x = cx;
+		y = cy;
+	}
+	
+	public void move(int dx, int dy) {
+		x += dx;
+		y += dy;
 	}
 	
 	public void setFollowPort(int w, int h) {
@@ -50,27 +66,32 @@ public class Camera {
 	}
 	
 	public void update() {
-		int cx = x + w/2;
-		int cy = y + h/2;
 		int fw2 = fw / 2;
 		int fh2 = fh / 2;
 		
-		int maxX = cx + fw2;
-		int minX = cx - fw2;
-		int maxY = cy + fh2;
-		int minY = cy - fh2;
-		
-		if (e.x > maxX) {
-			x += e.x - maxX;
-		} else if (e.x < minX) {
-			x += e.x - minX;
+		if (e != null) {
+			int maxX = x + fw2;
+			int minX = x - fw2;
+			int maxY = y + fh2;
+			int minY = y - fh2;
+			
+			if (e.x > maxX) {
+				x += e.x - maxX;
+			} else if (e.x < minX) {
+				x += e.x - minX;
+			}
+			
+			if (e.y > maxY) {
+				y += e.y - maxY;
+			} else if (e.y < minY) {
+				y += e.y - minY;
+			}
 		}
 		
-		if (e.y > maxY) {
-			y += e.y - maxY;
-		} else if (e.y < minY) {
-			y += e.y - minY;
-		}
+		pos[T_X] = -x;
+		pos[T_Y] = -y;
+		
+		//prog.setUniform4Matrix("camera", pos);
 	}
 	
 	public int getAX(double rx) {
@@ -98,11 +119,23 @@ public class Camera {
 		return y;
 	}
 	
+	public int getMinX() {
+		return x - (Window.WIDTH / 2);
+	}
+	
+	public int getMinY() {
+		return y - (Window.HEIGHT / 2);
+	}
+	
 	public int getMaxX() {
-		return x + w;
+		return x + (Window.WIDTH / 2);
 	}
 	
 	public int getMaxY() { 
-		return y + h;
+		return y + (Window.HEIGHT / 2);
+	}
+	
+	public void setUniforms(GLProgram prog) {
+		prog.setUniform4Matrix("camera", pos);
 	}
 }

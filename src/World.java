@@ -1,4 +1,3 @@
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.BufferedOutputStream;
@@ -8,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.lwjgl.opengl.GL20;
+
 public class World {	
 	public static int BLOCK_SIZE = 32;
 	
@@ -15,10 +16,39 @@ public class World {
 	private ChunkList chunks;
 	private ArrayList<Entity> entities;
 	
+	private BlockRegistry registry;
+		
 	public World() {
-		cam = new Camera();
+		registry = new BlockRegistry(Statics.BLK_TEX_CNT);
+		loadBlocks();
+		
 		chunks = new ChunkList();
 		entities = new ArrayList<Entity>();
+
+		Chunk.BACKDROP.load();
+		Chunk.BLOCK.load();
+		
+		cam = new Camera();
+		cam.setCenter(0, 0);
+		
+		ChunkRenderEngine.getInstance().setCamera(cam);
+	}
+	
+	private void loadBlocks() {
+		// Registering the blocks
+		registry.register(0, "air", false);
+		registry.register(1, "wall", true);
+		
+		// Loading the textures
+		ChunkRenderEngine engine = ChunkRenderEngine.getInstance();
+		engine.registerTexture(1, new CompoundTexture("texture.png")); // Wall
+		
+		// Loading the textures into the engine
+		engine.load();
+	}
+	
+	public BlockRegistry getBlockRegistry() {
+		return registry;
 	}
 	
 	private Chunk getChunk(int x, int y) {
@@ -43,7 +73,7 @@ public class World {
 		chunk.place(ox, oy, id);
 	}
 	
-	public int blockAt(int x, int y) {
+	public Block blockAt(int x, int y) {
 		Point coords = coord2chunk(x, y);
 		Chunk chunk = getChunk(coords.x, coords.y);
 		
@@ -149,7 +179,7 @@ public class World {
 	}
 	
 	public boolean isSolid(int x, int y) {
-		return Statics.COL[blockAt(x, y)];
+		return registry.isCollidable(blockAt(x, y));
 	}
 	
 	public BlockEntity getEntityAt(int x, int y) {
@@ -158,28 +188,19 @@ public class World {
 	}
 	
 	public Point pixel2coord(double px, double py) {
-		int bx = (int) (px / BLOCK_SIZE);
-		int by = (int) (py / BLOCK_SIZE);
-		
-		if (px < 0) bx--;
-		if (py < 0) by--;
+		int bx = (int) Math.floor(px / BLOCK_SIZE);
+		int by = (int) Math.floor(py / BLOCK_SIZE);
 		
 		return new Point(bx, by);
 	}
 	
 	public Point coord2pixel(int bx, int by) {
-		if (bx < 0) bx--;
-		if (by < 0) by--;
-		
 		return new Point(bx*BLOCK_SIZE, by*BLOCK_SIZE);
 	}
 	
 	public Point coord2chunk(int bx, int by) {
-		int cx = bx / Chunk.SIZE;
-		int cy = by / Chunk.SIZE;
-		
-		if (bx < 0) cx--;
-		if (by < 0) cy--;
+		int cx = (int) Math.floor((bx * 1.0) / Chunk.SIZE);
+		int cy = (int) Math.floor((by * 1.0) / Chunk.SIZE);
 		
 		return new Point(cx, cy);
 	}
@@ -253,28 +274,31 @@ public class World {
 	}
 	
 	// Called by window
-	public void draw(Graphics2D g) {
-		Point minP = pixel2coord(cam.getX(), cam.getY());
+	public void draw() {		
+		Point minP = pixel2coord(cam.getMinX(), cam.getMinY());
 		Point maxP = pixel2coord(cam.getMaxX(), cam.getMaxY());
 		Point minC = coord2chunk(minP.x, minP.y);
 		Point maxC = coord2chunk(maxP.x, maxP.y);
 		
+		// System.out.println(maxC);
+		// System.out.println(minC);
+				
 		for (int x = minC.x; x <= maxC.x; x++) {
 			for (int y = minC.y; y <= maxC.y; y++) {
-				getChunk(x, y).draw(g, cam);
+				getChunk(x, y).draw();
 			}
 		}
 			
-		for (Entity e : entities) {
-			e.draw(g, cam);
-		}
+//		for (Entity e : entities) {
+//			e.draw(g, cam);
+//		}
 	}
 	
 	public void update() {
 		for (Chunk c : chunks) {
 			c.update();
 		}
-		
+		cam.move(1, 0);
 		processCollisions();
 		cam.update();
 	}

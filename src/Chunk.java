@@ -1,58 +1,96 @@
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
+
 public class Chunk {
+	int b;
+	
 	int x = 0;
 	int y = 0;
+	
+	public static final GLTexture BACKDROP = new GLTexture("default.png");
+	public static final GLTexture BLOCK = new GLTexture("texture.png");
 	
 	public static int SIZE = 64;
 	public static int F_SIZE = (int) Math.pow((SIZE), 2) / Byte.SIZE;
 	public static int P_SIZE = SIZE * World.BLOCK_SIZE;
 	
-	byte[][] blocks;
+	public static final int LAYERS = 2;
+	public static final int FOREGROUND = 1;
+	public static final int BACKGROUND = 0;
+	
+	public static final int VERTEX_PARAMS = 6;
+	
+	Block[][][] blocks;
 	BlockEntity[][] blockEntities;
 	private World world;
-	
+	private BlockRegistry blockRegistry;
+		
 	public Chunk(World world, int x, int y) {
 		this.x = x;
 		this.y = y;
 		this.world = world;
-		blocks = new byte[SIZE][SIZE];
+		blocks = new Block[2][SIZE][SIZE];
+		fill();
+		
+		
 		blockEntities = new BlockEntity[SIZE][SIZE];
+		blockRegistry = world.getBlockRegistry();
 	}
 	
-	public void place(int x, int y, int id) {
-		blocks[x][y] = (byte)id;
+	private void fill() {
+		for (int layer = 0; layer < LAYERS; layer++) {
+			for (int cx = 0; cx < SIZE; cx++) {
+				for (int cy = 0; cy < SIZE; cy++) {
+					blocks[layer][cx][cy] = new Block(0);
+				}
+			}
+		}
+	}
+	
+	public void place(int layer, int x, int y, int id) {
+		blocks[layer][x][y] = new Block(id);
 		if (blockEntities[x][y] != null) {
 			blockEntities[x][y].remove();
 		}
 		
 		
-		if (Statics.BEN[id] != null) {
-			blockEntities[x][y] = Statics.BEN[id].create(x, y, world);
+		if (blockRegistry.hasBlockEntity(id)) {
+			blockEntities[x][y] = blockRegistry.getBlockEntity(id).create(x, y, world);
 		} else {
 			blockEntities[x][y] = null;
 		}
 	}
 	
-	public int blockAt(int x, int y) {
+	public void place(int x, int y, int id) {
+		place(FOREGROUND, x, y, id);
+	}
+	
+	public Block blockAt(int layer, int x, int y) {
 		try {
-			return (int) blocks[x][y];
+			return blocks[layer][x][y];
 		} catch (ArrayIndexOutOfBoundsException e) {
-			return 1;
+			return new Block(1);
 		}
 	}
 	
+	public Block blockAt(int x, int y) {
+		return blockAt(FOREGROUND, x, y);
+	}
+	
 	public boolean isSolid(int x, int y) {
-		return Statics.COL[blockAt(x, y)];
+		return blockRegistry.isCollidable(blockAt(x, y));
+		// return Statics.COL[blockAt(x, y)];
 	}
 	
 	public BlockEntity getEntityAt(int x, int y) {
-		return blockEntities[x][y];
+		return blockRegistry.getBlockEntity(blockAt(x, y));
 	}
 	
 	// Load a file from start returning the new start
@@ -69,7 +107,7 @@ public class Chunk {
 				if (((byte)(file[i] >> (7 - j)) & (byte) 0x01) == (byte)0x01) {
 					place(x, y, file[end++]);
 				} else {
-					blocks[x][y] = 0;
+					blocks[FOREGROUND][x][y] = new Block(0);
 				}
 			}
 		}
@@ -90,7 +128,7 @@ public class Chunk {
 				int x = (o + j) / SIZE;
 				int y = (o + j) % SIZE;
 				
-				int b = blockAt(x, y);
+				int b = blockAt(x, y).getID();
 				byte comparator = (byte)0x00;
 				
 				if (b != 0) {
@@ -117,24 +155,8 @@ public class Chunk {
 		}
 	}
 	
-	public void draw(Graphics2D g, Camera cam) {
-		for (int x = 0; x < SIZE; x++) {
-			for (int y = 0; y < SIZE; y++) {
-				int id = blocks[x][y];
-				BlockEntity e = blockEntities[x][y];
-				Color c = Statics.TEX[id];
-				if (c != null) {
-					g.setColor(c);
-					int ox = P_SIZE*this.x;
-					int oy = P_SIZE*this.y;
-					
-					g.fillRect(cam.getAX(ox + x*World.BLOCK_SIZE), cam.getAY(oy + y*World.BLOCK_SIZE), World.BLOCK_SIZE, World.BLOCK_SIZE);
-				}
-				if (e != null) {
-					e.draw(g, cam);
-				}
-			}
-		}
+	public void draw() {
+		ChunkRenderEngine.getInstance().drawChunk(x, y, blocks);
 	}
 	
 	public String toString() {
