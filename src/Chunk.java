@@ -8,14 +8,9 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class Chunk {
-	int b;
-	
+public class Chunk {	
 	int x = 0;
 	int y = 0;
-	
-	public static final GLTexture BACKDROP = new GLTexture("default.png");
-	public static final GLTexture BLOCK = new GLTexture("texture.png");
 	
 	public static int SIZE = 64;
 	public static int F_SIZE = (int) Math.pow((SIZE), 2) / Byte.SIZE;
@@ -25,10 +20,10 @@ public class Chunk {
 	public static final int FOREGROUND = 1;
 	public static final int BACKGROUND = 0;
 	
-	public static final int VERTEX_PARAMS = 6;
-	
 	Block[][][] blocks;
 	BlockEntity[][] blockEntities;
+	private int backdrop = 0;
+	
 	private World world;
 	private BlockRegistry blockRegistry;
 		
@@ -156,7 +151,7 @@ public class Chunk {
 	}
 	
 	public void draw() {
-		ChunkRenderEngine.getInstance().drawChunk(x, y, blocks);
+		ChunkRenderEngine.getInstance().drawChunk(x, y, backdrop, blocks);
 	}
 	
 	public String toString() {

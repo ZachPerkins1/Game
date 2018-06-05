@@ -1,35 +1,19 @@
 
-public class BlockRegistry {
+public class BlockRegistry extends Registry {
 	private BlockEntity[] entities;
-	private boolean[] collisionData;
-	private String[] names;
 	
 	public BlockRegistry(int capacity) {
+		super(capacity);
 		entities = new BlockEntity[capacity];
-		collisionData = new boolean[capacity];
-		names = new String[capacity];
 	}
 	
 	public void register(int id, String name, boolean collidable, BlockEntity entity) {
-		names[id] = name;
-		collisionData[id] = collidable;
+		super.register(id, name, collidable);
 		entities[id] = entity;
 	}
 	
 	public void register(int id, String name, boolean collidable) {
 		register(id, name, collidable, null);
-	}
-	
-	public String getName(int id) {
-		return names[id];
-	}
-	
-	public String getName(Block b) {
-		return names[b.getID()] + ":" + b.getSubID();
-	}
-	
-	public boolean isCollidable(int id) {
-		return collisionData[id];
 	}
 	
 	public boolean isCollidable(Block b) {

@@ -19,8 +19,11 @@ public class ChunkRenderEngine {
 	public static final String VERTEX_SHADER = "vertex.glsl";
 	public static final String FRAGMENT_SHADER = "fragment.glsl";
 	
+	public static final int VERTEX_PARAMS = 6;
+	
 	// This is where the actual block textures are stored
 	private GLTextureArray blockTextures; 
+	private GLTexture[] backdrops;
 	
 	private GLProgram program;
 	private Camera camera;
@@ -35,6 +38,7 @@ public class ChunkRenderEngine {
 	public ChunkRenderEngine() {
 		blockTextures = new GLTextureArray(World.BLOCK_SIZE, World.BLOCK_SIZE);
 		textureInfo = new CompoundTexture[Statics.BLK_TEX_CNT];
+		backdrops = new GLTexture[Statics.BDP_TEX_CNT];
 				
 		initShaderProgram();
 		initVAO();
@@ -60,7 +64,7 @@ public class ChunkRenderEngine {
 		int s = Chunk.SIZE;
 		
 		// For every coordinate in the vertex array there are VERTEX_PARAMS parameters. Every block has 4 vertices.
-		float[] data = new float[s*s*Chunk.VERTEX_PARAMS*4];
+		float[] data = new float[s*s*VERTEX_PARAMS*4];
 		int[] indices = new int[s*s*6];
 		
 		int[] blockData = new int[s*s*4];
@@ -82,7 +86,7 @@ public class ChunkRenderEngine {
 				float[] bys = new float[] {cy/(s*1.0f), (cy + 1)/(s*1.0f), (cy + 1)/(s*1.0f), cy/(s*1.0f)};
 				
 				int i = (s*cx + cy);
-				int id = i * Chunk.VERTEX_PARAMS * 4;
+				int id = i * VERTEX_PARAMS * 4;
 				int ic = 4*i;
 				
 				// The indices of the vertices in the form of 2 triangles as per OpenGL's request
@@ -171,18 +175,27 @@ public class ChunkRenderEngine {
 		texture.load(blockTextures);
 	}
 	
-	public void drawChunk(int x, int y, Block[][][] data) {
+	public void registerBackdrop(int id, String file) {
+		backdrops[id] = new GLTexture(file);
+	}
+	
+	public void drawChunk(int x, int y, int backdrop, Block[][][] data) {
 		glBindVertexArray(vao);
 		program.use();
 		
 		
-		bufferBlockData(data[1]);
 		program.setUniformTranslationMatrix("offset", x*Chunk.P_SIZE, y*Chunk.P_SIZE);
 		camera.setUniforms(program);
 		
-		Chunk.BACKDROP.use(0, program, "backdrop");
+		backdrops[backdrop].use(0, program, "backdrop");
 		blockTextures.use(1, program, "block");
 		
+		// There is so definitely a better way to do this but this works fine for now
+		program.setUniform("drawBackground", 1);
+		bufferBlockData(data[0]);
+		glDrawElements(GL_TRIANGLES, Chunk.SIZE*Chunk.SIZE*6, GL_UNSIGNED_INT, 0);
+		program.setUniform("drawBackground", 0);
+		bufferBlockData(data[1]);
 		glDrawElements(GL_TRIANGLES, Chunk.SIZE*Chunk.SIZE*6, GL_UNSIGNED_INT, 0);
 	}
 	
@@ -192,6 +205,11 @@ public class ChunkRenderEngine {
 	
 	public void load() {
 		blockTextures.load();
+		for (int i = 0; i < backdrops.length; i++) {
+			if (backdrops[i] != null) {
+				backdrops[i].load();
+			}
+		}
 	}
 	
 	public static ChunkRenderEngine getInstance() {

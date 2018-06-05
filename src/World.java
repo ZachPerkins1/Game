@@ -21,12 +21,10 @@ public class World {
 	public World() {
 		registry = new BlockRegistry(Statics.BLK_TEX_CNT);
 		loadBlocks();
+		loadEntities();
 		
 		chunks = new ChunkList();
 		entities = new ArrayList<Entity>();
-
-		Chunk.BACKDROP.load();
-		Chunk.BLOCK.load();
 		
 		cam = new Camera();
 		cam.setCenter(0, 0);
@@ -43,8 +41,14 @@ public class World {
 		ChunkRenderEngine engine = ChunkRenderEngine.getInstance();
 		engine.registerTexture(1, new CompoundTexture("texture.png")); // Wall
 		
+		engine.registerBackdrop(0, "default.png");
+		
 		// Loading the textures into the engine
 		engine.load();
+	}
+	
+	private void loadEntities() {
+		Player.load();
 	}
 	
 	public BlockRegistry getBlockRegistry() {
@@ -289,15 +293,16 @@ public class World {
 			}
 		}
 			
-//		for (Entity e : entities) {
-//			e.draw(g, cam);
-//		}
+		for (Entity e : entities) {
+			e.draw(cam);
+		}
 	}
 	
 	public void update() {
 		for (Chunk c : chunks) {
 			c.update();
 		}
+		
 		cam.move(1, 0);
 		processCollisions();
 		cam.update();

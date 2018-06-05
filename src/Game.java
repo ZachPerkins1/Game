@@ -35,7 +35,7 @@ public class Game implements WindowListener, MouseListener, MouseMotionListener,
 			e.printStackTrace();
 		}
 		
-		player = new Entity(world, 100, 300);
+		player = new Player(world, 100, 300);
 		world.addEntity(player);
 		c = world.getCamera();
 		//c.setFollowing(player);

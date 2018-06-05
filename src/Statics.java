@@ -11,6 +11,7 @@ public class Statics {
 	
 	//The amount of block textures there are
 	public static int BLK_TEX_CNT = 255;
+	public static int BDP_TEX_CNT = 63;
 	
 	// Block static initializer
 	static {

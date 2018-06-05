@@ -92,6 +92,8 @@ public class Test {
 		System.out.println(glGetString(GL_VERSION));
 		System.out.println(glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS));
 		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				
 		// Set the clear color
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -111,6 +113,8 @@ public class Test {
 		    glfwSwapBuffers(window);
 		    
 		    long end = System.currentTimeMillis();
+		    System.out.println(end - start);
+		    
 		    try {
 				Thread.sleep(Math.max((1000/60) - ((end - start)), 0));
 			} catch (Exception e) {

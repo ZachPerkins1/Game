@@ -38,18 +38,8 @@ public class Entity {
 		this.hasCollided = false;
 	}
 	
-	public void draw(Graphics2D g, Camera c) {
-		g.setColor(Color.BLUE);
-
-//		pathfind debug code
-//
-//		for (int i = 0; i < pathLen; i++) {
-//			Point p = path[i];s
-//			g.fillRect(p.x, p.y, world.blockSize, world.blockSize);
-//		}
+	public void draw(Camera cam) {
 		
-		g.setColor(Color.RED);
-		g.fillOval(c.getAX(x - w/2), c.getAY(y - h/2), w, h);
 	}
 	
 	public void update() {

@@ -16,7 +16,7 @@ public class GLTexture {
 	private int[] raw;
 	int glId;
 	
-	public GLTexture(String file) {
+	public GLTexture(String file, boolean flip) {
 		try {
 			glId = -1;
 			BufferedImage texture = ImageIO.read(new File(file));
@@ -25,12 +25,18 @@ public class GLTexture {
 			
 			raw = new int[width*height];
 			texture.getRGB(0, 0, width, height, raw, 0, width);
-			flip();
+			
+			if (flip) flip();
 		} catch (IOException e) {
 			raw = null;
 			e.printStackTrace();
 		}
 	}
+	
+	public GLTexture(String file) {
+		this(file, true);
+	}
+	
 	
 	public int getWidth() {
 		return width;
@@ -68,12 +74,12 @@ public class GLTexture {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, glId);
 		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, raw);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, raw);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	
