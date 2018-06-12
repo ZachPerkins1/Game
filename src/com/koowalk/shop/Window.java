@@ -137,7 +137,6 @@ public class Window {
 		    glfwSwapBuffers(window);
 		    
 		    long end = System.currentTimeMillis();
-		    System.out.println(end - start);
 		    
 		    try {
 				Thread.sleep(Math.max((1000/60) - ((end - start)), 0));

@@ -20,4 +20,20 @@ public class Block {
 	public int getSubID() {
 		return subID;
 	}
+	
+	public Block clone() {
+		return new Block(id, subID);
+	}
+	
+	public boolean equals(Block b) {
+		return b.id == id && b.subID == subID;
+	}
+	
+	public boolean isAir() {
+		return id == 0;
+	}
+	
+	public String toString() {
+		return "id: " + id + "sub_id: " + subID;
+	}
 }

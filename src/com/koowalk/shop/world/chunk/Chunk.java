@@ -1,18 +1,9 @@
 package com.koowalk.shop.world.chunk;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import com.koowalk.shop.graphics.ChunkRenderEngine;
+import com.koowalk.shop.util.SortedPoint2D;
 import com.koowalk.shop.world.World;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
-
-public class Chunk {	
+public class Chunk extends SortedPoint2D {	
 	public int x = 0;
 	public int y = 0;
 	
@@ -26,18 +17,19 @@ public class Chunk {
 	
 	Block[][][] blocks;
 	BlockEntity[][] blockEntities;
-	private int backdrop = 0;
+	private int backdrop;
 	
 	private World world;
 	private BlockRegistry blockRegistry;
+	
 		
 	public Chunk(World world, int x, int y) {
 		this.x = x;
 		this.y = y;
+		this.backdrop = 0;
 		this.world = world;
 		blocks = new Block[2][SIZE][SIZE];
 		fill();
-		
 		
 		blockEntities = new BlockEntity[SIZE][SIZE];
 		blockRegistry = world.getBlockRegistry();
@@ -53,15 +45,15 @@ public class Chunk {
 		}
 	}
 	
-	public void place(int layer, int x, int y, int id) {
-		blocks[layer][x][y] = new Block(id);
+	public void place(int layer, int x, int y, Block b) {
+		blocks[layer][x][y] = b.clone();
 		if (blockEntities[x][y] != null) {
 			blockEntities[x][y].remove();
 		}
 		
 		
-		if (blockRegistry.hasBlockEntity(id)) {
-			blockEntities[x][y] = blockRegistry.getBlockEntity(id).create(x, y, world);
+		if (blockRegistry.hasBlockEntity(b.getID())) {
+			blockEntities[x][y] = blockRegistry.getBlockEntity(b.getID()).create(x, y, world);
 		} else {
 			blockEntities[x][y] = null;
 		}
@@ -69,6 +61,10 @@ public class Chunk {
 	
 	public void place(int x, int y, int id) {
 		place(FOREGROUND, x, y, id);
+	}
+	
+	public void place(int layer, int x, int y, int id) {
+		place(layer, x, y, new Block(id));
 	}
 	
 	public Block blockAt(int layer, int x, int y) {
@@ -92,59 +88,6 @@ public class Chunk {
 		return blockRegistry.getBlockEntity(blockAt(x, y));
 	}
 	
-	// Load a file from start returning the new start
-	public int load(byte[] file, int start) {
-		int end = start + F_SIZE;
-		
-		for (int i = start; i < start + F_SIZE; i++) {
-			int o = (i - start) * Byte.SIZE;
-			
-			for (int j = 0; j < 8; j++) {
-				int x = (o + j) / SIZE;
-				int y = (o + j) % SIZE;
-				
-				if (((byte)(file[i] >> (7 - j)) & (byte) 0x01) == (byte)0x01) {
-					place(x, y, file[end++]);
-				} else {
-					blocks[FOREGROUND][x][y] = new Block(0);
-				}
-			}
-		}
-		
-		return end;
-	}
-	
-	// Save the chunk to a file
-	public void save(BufferedOutputStream file) throws IOException {
-		ArrayList<Byte> blockList = new ArrayList<Byte>();
-		byte[] buffer = new byte[F_SIZE];
-		
-		for (int i = 0; i < F_SIZE; i++) {
-			int o = i * Byte.SIZE;
-			buffer[i] = 0;
-			
-			for (int j = 0; j < 8; j++) {
-				int x = (o + j) / SIZE;
-				int y = (o + j) % SIZE;
-				
-				int b = blockAt(x, y).getID();
-				byte comparator = (byte)0x00;
-				
-				if (b != 0) {
-					blockList.add((byte)b);
-					comparator = (byte)0x01;
-				}
-				
-				buffer[i] = (byte) ((buffer[i] | comparator) << (j == 7? 0: 1));
-			}
-		}
-		
-		file.write(buffer);
-		for (byte b : blockList) {
-			file.write(b);
-		}
-	}
-	
 	public void update() {
 		for (int x = 0; x < SIZE; x++) {
 			for (int y = 0; y < SIZE; y++) {
@@ -160,5 +103,15 @@ public class Chunk {
 	
 	public String toString() {
 		return "Chunk: x=" + x + " y=" + y;
+	}
+
+	@Override
+	public int getX() {
+		return x;
+	}
+
+	@Override
+	public int getY() {
+		return y;
 	}
 }

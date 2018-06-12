@@ -6,12 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.koowalk.shop.Statics;
 import com.koowalk.shop.Util;
 import com.koowalk.shop.graphics.ChunkRenderEngine;
 import com.koowalk.shop.graphics.CompoundTexture;
+import com.koowalk.shop.util.SortedPoint2D;
 import com.koowalk.shop.world.chunk.Block;
 import com.koowalk.shop.world.chunk.BlockEntity;
 import com.koowalk.shop.world.chunk.BlockRegistry;
@@ -28,8 +30,13 @@ public class World {
 	private ArrayList<Entity> entities;
 	
 	private BlockRegistry registry;
+	private MapFile file;
+	
+	private int counter = 0;
 		
-	public World() {
+	public World(MapFile file) {
+		this.file = file;
+		
 		registry = new BlockRegistry(Statics.BLK_TEX_CNT);
 		loadBlocks();
 		loadEntities();
@@ -73,8 +80,30 @@ public class World {
 			return c; // Oh cool we don't need to do any work
 		
 		c = new Chunk(this, x, y);
-		chunks.add(c);
+		
+		try {
+			file.loadChunk(c);
+		} catch (SQLException e) {
+			System.out.println("No data found for chunk (" + c.x + ", " + c.y + ")");
+		}
+		
+		chunks.addSorted(c);
 		return c;
+	}
+	
+	// Unload and save all the currently loaded chunks
+	public void saveChunks() {
+		for (SortedPoint2D c : chunks) {
+			Chunk chunk = (Chunk) c;
+			
+			try {
+				file.saveChunk(chunk);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		chunks.removeAll(chunks);
 	}
 	
 	// Places block at absolute positions of x and y
@@ -224,72 +253,8 @@ public class World {
 		return new Point(cx, cy);
 	}
 	
-	// Load from a file where the top 8 bytes specify map size and the remaining individual bytes
-	// specify the blocks themselves. Currently sets a hard range on block ids from 0-255
-	public void open(String filename) throws IOException {
-		// BufferedInputStream stream = new BufferedInputStream(new FileInputStream(filename));
-		byte[] map = Files.readAllBytes(Paths.get(filename));
-		
-		
-		if (map.length < 4 ||
-			map[0] != (byte) 0xba ||
-			map[1] != (byte) 0xd0 ||
-			map[2] != (byte) 0xda ||
-			map[3] != (byte) 0xd0) {
-			System.out.println(map[0]);
-			throw new IOException("File format not recognized");
-		}
-		
-		int i = 4;
-		System.out.println(map.length);
-		while (i < map.length) {
-			int x = arrToInt(map, i);
-			int y = arrToInt(map, i + Integer.BYTES);
-			Chunk c = new Chunk(this, x, y);
-			System.out.println(c);
-			i = c.load(map, i + Integer.BYTES*2);
-			chunks.add(c);
-		}
-	}
-	
-	// Saves using the same process
-	public void save(String filename) throws IOException {
-		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(filename));
-		
-		byte[] header = new byte[] {(byte) 0xba, (byte) 0xd0, (byte) 0xda, (byte) 0xd0};
-		stream.write(header);
-		for (Chunk c : chunks) {
-			byte[] coords = new byte[Integer.BYTES * 2];
-			intToArr(c.x, coords, 0);
-			intToArr(c.y, coords, Integer.BYTES);
-			stream.write(coords);
-			c.save(stream);
-		}
-		
-		stream.close();
-	}
-	
-	// Take bytes out of an arr from start and convert them to int
-	private int arrToInt(byte[] arr, int start) {
-		int x = arr[start + 0] << 24 |
-				arr[start + 1] << 16 |
-				arr[start + 2] << 8  |
-				arr[start + 3];
-		
-		return x;
-	}
-	
 	public Camera getCamera() {
 		return cam;
-	}
-	
-	// Take individual bytes out of an int and shove them into an arr at
-	// start
-	private void intToArr(int n, byte[] arr, int start) {
-		arr[start + 3] = (byte) n;
-		arr[start + 2] = (byte) (n >> 8);
-		arr[start + 1] = (byte) (n >> 16);
-		arr[start] = (byte) (n >> 24);
 	}
 	
 	// Called by window
@@ -311,9 +276,16 @@ public class World {
 	}
 	
 	public void update() {
-		for (Chunk c : chunks) {
-			c.update();
+		for (SortedPoint2D c : chunks) {
+			((Chunk)c).update();
 		}
+		
+		if (counter == 60*60) {
+			saveChunks();
+			System.out.println("Saving map...");
+		}
+		
+		counter++;
 		
 		processCollisions();
 		cam.update();

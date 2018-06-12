@@ -30,13 +30,8 @@ public class Game {
 	public Game() {
 		movement = new boolean[4];
 		
-		world = new World();
-		try {
-			world.open("a.map");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		GameFile g = new GameFile("test");
+		world = new World(g.getMap());
 		
 		player = new Player(world, 100, 300);
 		world.addEntity(player);
@@ -79,11 +74,7 @@ public class Game {
 	}
 	
 	public void windowClosing() {
-		try {
-			world.save("a.map");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		world.saveChunks();
 	}
 	
 	public void mouseClicked(int button, double x, double y) {
