@@ -283,6 +283,7 @@ public class World {
 		if (counter == 60*60) {
 			saveChunks();
 			System.out.println("Saving map...");
+			counter = 0;
 		}
 		
 		counter++;

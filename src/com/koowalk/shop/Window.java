@@ -4,8 +4,16 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import com.koowalk.shop.graphics.ChunkRenderEngine;
+import com.koowalk.shop.graphics.FontLoader;
+import com.koowalk.shop.graphics.GLTexture;
+import com.koowalk.shop.graphics.GLTextureArray;
+import com.koowalk.shop.graphics.TextureRegistry;
+import com.koowalk.shop.guis.GUIImage;
+import com.koowalk.shop.guis.GUIManager;
 
+import java.io.IOException;
 import java.nio.*;
+import java.util.HashMap;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -35,6 +43,16 @@ public class Window {
 		// Terminate GLFW and free the error callback
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
+	}
+	
+	private void loadTextures() {
+		GLTextureArray blocks = new GLTextureArray(32, 32);
+		blocks.add("texture.png");
+		TextureRegistry.add(blocks);
+		
+		TextureRegistry.add(new GLTexture("player.png"));
+		
+		TextureRegistry.load();
 	}
 
 	private void init() {
@@ -101,7 +119,21 @@ public class Window {
 		GL.createCapabilities();
 		
 		// Load buffer data for chunk rendering
+		loadTextures();
 		ChunkRenderEngine.create();
+		GUIImage img = new GUIImage(1);
+		HashMap<String, Object> attr = new HashMap<String, Object>();
+		attr.put("x", 0);
+		attr.put("y", 0);
+		img.setParent(GUIManager.getInstance().getMaster(), attr);
+		
+		try {
+			FontLoader.getInstance().load("OpenSans-Regular.ttf", 30);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		FontLoader.getInstance().getPreloaded("OpenSans-Regular", 30).fillBuffers(1, 1, 0, 0, "hello");
 		
 		game = new Game();
 		glfwShowWindow(window);
@@ -132,6 +164,7 @@ public class Window {
 			game.update();
 			glClear(GL_COLOR_BUFFER_BIT); // clear the framebuffer
 			game.draw();
+			GUIManager.getInstance().draw();
 			glFlush();
 			
 		    glfwSwapBuffers(window);

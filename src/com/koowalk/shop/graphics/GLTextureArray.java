@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL45.*;
 
-public class GLTextureArray {
+public class GLTextureArray implements LoadableTexture {
 	private int glId;
 	private int[] raw;
 	private int counter;

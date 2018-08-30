@@ -7,15 +7,10 @@ import static org.lwjgl.opengl.GL30.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
-public class GLTexture {
-	private int width;
-	private int height;
-	
+public class GLTexture extends GLImage {
 	private int[] raw;
-	int glId;
 	
 	public GLTexture(String file, boolean flip) {
 		try {
@@ -36,19 +31,6 @@ public class GLTexture {
 	
 	public GLTexture(String file) {
 		this(file, true);
-	}
-	
-	
-	public int getWidth() {
-		return width;
-	}
-	
-	public int getHeight() {
-		return height;
-	}
-	
-	public int getglId() {
-		return glId;
 	}
 	
 	public int[] getRaw() {
@@ -82,11 +64,7 @@ public class GLTexture {
 		
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, raw);
 		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	
-	public void use(int binding, GLProgram program, String handle) {
-		glActiveTexture(GL_TEXTURE0 + binding);
-		glBindTexture(GL_TEXTURE_2D, glId);
-		program.setUniform(handle, binding);
+		
+		raw = null;
 	}
 }
