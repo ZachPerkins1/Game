@@ -9,6 +9,7 @@ import com.koowalk.shop.graphics.GLTexture;
 import com.koowalk.shop.graphics.GLTextureArray;
 import com.koowalk.shop.graphics.TextureRegistry;
 import com.koowalk.shop.guis.GUIImage;
+import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUIManager;
 
 import java.io.IOException;
@@ -128,12 +129,19 @@ public class Window {
 		img.setParent(GUIManager.getInstance().getMaster(), attr);
 		
 		try {
-			FontLoader.getInstance().load("OpenSans-Regular.ttf", 30);
+			FontLoader.getInstance().load("OpenSans-Regular.ttf", 20);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		FontLoader.getInstance().getPreloaded("OpenSans-Regular", 30).fillBuffers(1, 1, 0, 0, "hello");
+		try {
+			GUILabel label = new GUILabel("OpenSans-Regular", 20);
+			label.setParent(GUIManager.getInstance().getMaster(), attr);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// FontLoader.getInstance().getPreloaded("OpenSans-Regular", 30).fillBuffers(1, 1, 0, 0, "hello");
 		
 		game = new Game();
 		glfwShowWindow(window);

@@ -11,7 +11,9 @@ import org.lwjgl.stb.*;
 import static org.lwjgl.stb.STBTruetype.*;
 
 public class FontLoader {
-	ArrayList<Font> fonts;
+	public static final int FONT_SHEET_WIDTH = 512;
+	
+	private ArrayList<Font> fonts;
 	private static FontLoader instance = null;
 	
 	public FontLoader() {
@@ -20,13 +22,12 @@ public class FontLoader {
 	
 	public Font load(String fontFile, int size, int min, int max) throws IOException {
 		ByteBuffer fontBuffer = readFontFile(fontFile);
-		fontBuffer.flip();
-		ByteBuffer imgBuffer = MemoryUtil.memAlloc(512*512);
+		ByteBuffer imgBuffer = MemoryUtil.memAlloc(FONT_SHEET_WIDTH*1024);
 		STBTTBakedChar.Buffer charBuffer = STBTTBakedChar.malloc(max - min);
-		System.out.println(stbtt_BakeFontBitmap(fontBuffer, size, imgBuffer, 512, 512, min, charBuffer));
-		// GLTexture tex = allocateTexture(imgBuffer, 512, 512);
-		System.out.println(fontFile.split(".").length);
-		Font font = new Font(charBuffer, 0, size, min, fontFile.substring(0, fontFile.length() - 4));
+		int maxHeight = stbtt_BakeFontBitmap(fontBuffer, size, imgBuffer, FONT_SHEET_WIDTH, 1024, min, charBuffer);
+		MemoryUtil.memFree(fontBuffer);
+		GLFontSheet tex = allocateTexture(imgBuffer, FONT_SHEET_WIDTH, maxHeight);
+		Font font = new Font(fontFile.substring(0, fontFile.length() - 4), charBuffer, tex, size, min);
 		fonts.add(font);
 		return font;
 	}
@@ -56,17 +57,17 @@ public class FontLoader {
 	private ByteBuffer readFontFile(String fontFile) throws IOException {
 		RandomAccessFile fin = new RandomAccessFile(fontFile, "r");
 		FileChannel fc = fin.getChannel();
-		ByteBuffer fontBuffer = ByteBuffer.allocateDirect((int)fc.size());
+		ByteBuffer fontBuffer = MemoryUtil.memAlloc((int)fc.size());
 		fin.getChannel().read(fontBuffer);
 		fin.close();
+		fontBuffer.flip();
 		return fontBuffer;
 	}
 	
-	private GLTexture allocateTexture(ByteBuffer texData, int width, int height) {
-		//GLTexture texture = new GLTexture(texData, width, height);
-		// texture.load();
-		// return texture;
-		return null;
+	private GLFontSheet allocateTexture(ByteBuffer texData, int width, int height) {
+		GLFontSheet texture = new GLFontSheet(texData, width, height);
+		texture.load();
+		return texture;
 	}
 	
 	public static FontLoader getInstance() {

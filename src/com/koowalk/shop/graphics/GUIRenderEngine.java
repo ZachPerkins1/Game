@@ -11,10 +11,14 @@ import java.util.HashMap;
 
 import com.koowalk.shop.guis.GUIComponent;
 import com.koowalk.shop.guis.GUIImage;
+import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUITypeIdentifier;
 
 public class GUIRenderEngine {
-	GLProgram program;
+	public static final String SHADER_DIRECTORY = "gui_shaders/";
+	public static final String[] SHADER_NAMES = new String[] {"image", "text", "frame"};
+	
+	private GLProgram[] programs;
 	
 	HashMap<Long, Integer> vaos;
 	
@@ -24,16 +28,17 @@ public class GUIRenderEngine {
 	}
 	
 	private void createPrograms() {
-		program = new GLProgram();
 		try {
-			program.loadShader("gui_shaders/image_vertex.glsl", GL_VERTEX_SHADER);
-			program.loadShader("gui_shaders/image_fragment.glsl", GL_FRAGMENT_SHADER);
+			programs = new GLProgram[GUITypeIdentifier.TYPE_COUNT];
+			for (int i = 0; i < programs.length; i++) {
+				programs[i] = new GLProgram();
+				programs[i].loadShader(SHADER_DIRECTORY + SHADER_NAMES[i] + "_vertex.glsl", GL_VERTEX_SHADER);
+				programs[i].loadShader(SHADER_DIRECTORY + SHADER_NAMES[i] + "_fragment.glsl", GL_FRAGMENT_SHADER);
+				programs[i].link();
+			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		program.link();
 	}
 	
 	public void drawComponent(GUIComponent component) {
@@ -46,25 +51,36 @@ public class GUIRenderEngine {
 		}
 		
 		glBindVertexArray(vao);
-		program.use();
+		programs[component.getType().getIndex()].use();
 		
 		if (component.getType() == GUITypeIdentifier.TYPE_IMAGE) {
 			drawImage((GUIImage)component);
+		} else if (component.getType() == GUITypeIdentifier.TYPE_LABEL) {
+			drawLabel((GUILabel)component);
 		}
 	}
 	
 	private void drawImage(GUIImage image) {
-		program.use();
-		image.getImage().use(0, program, "tex");
+		programs[0].use();
+		image.getImage().use(0, programs[0], "tex");
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
+	
+	private void drawLabel(GUILabel label) {
+		programs[1].use();
+		label.getFont().useTexture(programs[GUITypeIdentifier.TYPE_LABEL.getIndex()], "tex");
+		glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
 	}
 	
 	private int createVAO(GUIComponent component) {
 		int vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 		
+		
 		if (component.getType() == GUITypeIdentifier.TYPE_IMAGE) {
 			loadImageVAO((GUIImage) component);
+		} else if (component.getType() == GUITypeIdentifier.TYPE_LABEL) {
+			loadLabelVAO((GUILabel)component);
 		}
 		
 		vaos.put(component.getUID(), vao);
@@ -97,5 +113,9 @@ public class GUIRenderEngine {
 		
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, Float.BYTES*4, Float.BYTES*2);
+	}
+	
+	private void loadLabelVAO(GUILabel label) {
+		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), 50, 50, "Thisi");
 	}
 }

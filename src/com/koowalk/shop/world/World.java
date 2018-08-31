@@ -131,7 +131,8 @@ public class World {
 		entities.add(e);
 	}
 	
-	// Process collision
+	// Advance the entity by a reasonable amount until it reaches the block and collides
+	// TODO: this should be split into some subroutines, it's a wee bit unruly in its current state
 	public void processCollisions() {
 		for (Entity e : entities) {
 			while (isColliding(e.x, e.y, e.getW(), e.getH())) {
