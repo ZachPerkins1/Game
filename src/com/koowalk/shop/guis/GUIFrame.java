@@ -16,6 +16,10 @@ public class GUIFrame extends GUIComponent {
 		this(new GUILayoutAbsolute());
 	}
 	
+	public GUIFrame(Color color) {
+		this(new GUILayoutAbsolute(), color);
+	}
+	
 	public GUIFrame(GUILayout layout) {
 		this(layout, new Color(0,0,0,0));
 	}
@@ -41,13 +45,22 @@ public class GUIFrame extends GUIComponent {
 	}
 	
 	public void update() {
-		layoutManager.update();
 		for (GUIComponent child : children) {
 			child.update();
 		}
+		
+		layoutManager.update();
 	}
 	
 	public Color getColor() {
 		return color;
+	}
+	
+	public int getWidth() {
+		return layoutManager.getBoundingWidth();
+	}
+	
+	public int getHeight() {
+		return layoutManager.getBoundingHeight();
 	}
 }

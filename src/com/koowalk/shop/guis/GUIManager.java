@@ -1,5 +1,7 @@
 package com.koowalk.shop.guis;
 
+import java.awt.Color;
+
 import com.koowalk.shop.graphics.GUIRenderEngine;
 
 public class GUIManager {
@@ -12,7 +14,7 @@ public class GUIManager {
 	private GUIFrame master;
 	
 	public GUIManager() {
-		master = new GUIFrame();
+		master = new GUIFrame(Color.BLUE);
 		renderEngine = new GUIRenderEngine();
 	}
 	
@@ -29,12 +31,11 @@ public class GUIManager {
 	}
 	
 	private void render(GUIFrame frame) {
+		renderEngine.drawComponent(frame);
 		for (GUIComponent child : frame.getChildren()) {
-			if (child.getType() == GUITypeIdentifier.TYPE_FRAME) {
+			renderEngine.drawComponent(child);
+			if (child.getType() == GUITypeIdentifier.TYPE_FRAME)
 				render((GUIFrame)child);
-			} else {
-				renderEngine.drawComponent(child);
-			}
 		}
 	}
 	

@@ -15,5 +15,7 @@ public abstract class GUILayout {
 		components.add(component);
 	}
 	
+	public abstract int getBoundingWidth();
+	public abstract int getBoundingHeight();
 	public abstract void update();
 }

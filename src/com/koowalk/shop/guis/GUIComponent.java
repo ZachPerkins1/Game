@@ -23,7 +23,7 @@ public abstract class GUIComponent extends GUILayoutComponent {
 			return width;
 		}
 		
-		return getWidth() + pLeft + pRight;
+		return getWidth();
 	}
 	
 	public int _getHeight() {
@@ -31,7 +31,15 @@ public abstract class GUIComponent extends GUILayoutComponent {
 			return height;
 		}
 		
-		return getHeight() + pTop + pBottom;
+		return getHeight();
+	}
+	
+	public int getPaddedWidth() {
+		return _getWidth() + pLeft + pRight;
+	}
+	
+	public int getPaddedHeight() {
+		return _getHeight() + pTop + pBottom;
 	}
 	
 	public int getWidth() { return width; }
@@ -39,7 +47,7 @@ public abstract class GUIComponent extends GUILayoutComponent {
 	
 	public int getX() {
 		if (parent != null) {
-			return x + parent.getX();
+			return x + parent.getPaddedX();
 		}
 		
 		return x;
@@ -47,10 +55,28 @@ public abstract class GUIComponent extends GUILayoutComponent {
 	
 	public int getY() {
 		if (parent != null) {
-			return y + parent.getY();
+			return y + parent.getPaddedY();
 		}
 		
 		return y;
+	}
+	
+	public int getPaddedX() {
+		int padX = x + pLeft;
+		
+		if (parent != null)
+			padX += parent.getPaddedX();
+		
+		return padX;
+	}
+	
+	public int getPaddedY() {
+		int padY = y + pTop;
+		
+		if (parent != null)
+			padY += parent.getPaddedY();
+		
+		return padY;
 	}
 	
 	public void setPadding(int top, int bottom, int left, int right) {
@@ -58,6 +84,10 @@ public abstract class GUIComponent extends GUILayoutComponent {
 		pBottom = bottom;
 		pLeft = left;
 		pRight = right;
+	}
+	
+	public void setPadding(int p) {
+		setPadding(p, p, p, p);
 	}
 	
 	public void setPaddingY(int top, int bottom) {

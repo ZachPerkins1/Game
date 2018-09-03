@@ -11,6 +11,9 @@ public abstract class GUILayoutComponent implements GUIGLDrawable {
 	public abstract int _getWidth();
 	public abstract int _getHeight();
 	
+	public abstract int getPaddedWidth();
+	public abstract int getPaddedHeight();
+	
 	public GUILayoutComponent() {
 		uid = uidCounter;
 		uidCounter++;

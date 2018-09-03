@@ -59,6 +59,8 @@ public class GUIRenderEngine {
 			drawImage((GUIImage)component);
 		} else if (component.getType() == GUITypeIdentifier.TYPE_LABEL) {
 			drawLabel((GUILabel)component);
+		} else if (component.getType() == GUITypeIdentifier.TYPE_FRAME) {
+			drawFrame((GUIFrame)component);
 		}
 	}
 	
@@ -99,6 +101,8 @@ public class GUIRenderEngine {
 			loadImageVAO((GUIImage) component);
 		} else if (component.getType() == GUITypeIdentifier.TYPE_LABEL) {
 			loadLabelVAO((GUILabel)component);
+		} else if (component.getType() == GUITypeIdentifier.TYPE_FRAME) {
+			loadFrameVAO((GUIFrame)component);
 		}
 		
 		vaos.put(component.getUID(), vao);
@@ -114,10 +118,10 @@ public class GUIRenderEngine {
 		
 		
 		float[] data = new float[] 
-					   {image.getX(),                     image.getY(),                      0, 1,
-						image.getX() + image._getWidth(), image.getY(),                      1, 1,
-						image.getX() + image._getWidth(), image.getY() + image._getHeight(), 1, 0,
-						image.getX()                    , image.getY() + image._getHeight(), 0, 0};
+					   {image.getPaddedX(),                     image.getPaddedY(),                      0, 1,
+						image.getPaddedX() + image._getWidth(), image.getPaddedY(),                      1, 1,
+						image.getPaddedX() + image._getWidth(), image.getPaddedY() + image._getHeight(), 1, 0,
+						image.getPaddedX()                    , image.getPaddedY() + image._getHeight(), 0, 0};
 		
 		int[] indices = new int[] {3, 1, 0, 3, 2, 1};
 				
@@ -139,10 +143,10 @@ public class GUIRenderEngine {
 		
 		
 		float[] data = new float[] 
-					   {frame.getX(),                     frame.getY(),                     
-						frame.getX() + frame._getWidth(), frame.getY(),                    
-						frame.getX() + frame._getWidth(), frame.getY() + frame._getHeight(),
-						frame.getX()                    , frame.getY() + frame._getHeight()};
+					   {frame.getX(),                          frame.getY(),                     
+						frame.getX() + frame.getPaddedWidth(), frame.getY(),                    
+						frame.getX() + frame.getPaddedWidth(), frame.getY() + frame.getPaddedHeight(),
+						frame.getX()                         , frame.getY() + frame.getPaddedHeight()};
 		
 		int[] indices = new int[] {3, 1, 0, 3, 2, 1};
 				
@@ -155,6 +159,6 @@ public class GUIRenderEngine {
 	
 	private void loadLabelVAO(GUILabel label) {
 		System.out.println(label.getX());
-		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), label.getX(), label.getY(), label.getText());
+		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), label.getPaddedX(), label.getPaddedY(), label.getText());
 	}
 }

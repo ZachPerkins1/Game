@@ -8,6 +8,7 @@ import com.koowalk.shop.graphics.FontLoader;
 import com.koowalk.shop.graphics.GLTexture;
 import com.koowalk.shop.graphics.GLTextureArray;
 import com.koowalk.shop.graphics.TextureRegistry;
+import com.koowalk.shop.guis.GUIFrame;
 import com.koowalk.shop.guis.GUIImage;
 import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUIManager;
@@ -127,7 +128,14 @@ public class Window {
 		HashMap<String, Object> attr = new HashMap<String, Object>();
 		attr.put("x", 50);
 		attr.put("y", 50);
-		img.setParent(GUIManager.getInstance().getMaster(), attr);
+		HashMap<String, Object> attr2 = new HashMap<String, Object>();
+		attr2.put("x", 0);
+		attr2.put("y", 0);
+		
+		GUIFrame frame = new GUIFrame(Color.RED);
+		frame.setParent(GUIManager.getInstance().getMaster(), attr);
+		// frame.setPadding(20);
+		// img.setParent(GUIManager.getInstance().getMaster(), attr);
 		
 		try {
 			FontLoader.getInstance().load("OpenSans-Regular.ttf", 20);
@@ -136,8 +144,8 @@ public class Window {
 		}
 		
 		try {
-			GUILabel label = new GUILabel("OpenSans-Regular", 20, "I like to eat ashwin asshole");
-			label.setParent(GUIManager.getInstance().getMaster(), attr);
+			GUILabel label = new GUILabel("OpenSans-Regular", 60, "Rutika");
+			label.setParent(frame, attr2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
