@@ -5,11 +5,13 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import com.koowalk.shop.guis.GUIComponent;
+import com.koowalk.shop.guis.GUIFrame;
 import com.koowalk.shop.guis.GUIImage;
 import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUITypeIdentifier;
@@ -67,9 +69,25 @@ public class GUIRenderEngine {
 	}
 	
 	private void drawLabel(GUILabel label) {
-		programs[1].use();
+		// Grab the color components and stick them into the shader
+		Color color = label.getColor();
+		float[] colorComponents = new float[4];
+		color.getComponents(colorComponents);
+		programs[GUITypeIdentifier.TYPE_LABEL.getIndex()].setUniform4Vec("color", colorComponents);
+		
+		// Use the font sheet for rendering
 		label.getFont().useTexture(programs[GUITypeIdentifier.TYPE_LABEL.getIndex()], "tex");
-		glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, label.getVertexCount(), GL_UNSIGNED_INT, 0);
+	}
+	
+	private void drawFrame(GUIFrame frame) {
+		Color color = frame.getColor();
+		if (color.getAlpha() != 0) {
+			float[] colorComponents = new float[4];
+			color.getComponents(colorComponents);
+			programs[GUITypeIdentifier.TYPE_FRAME.getIndex()].setUniform4Vec("color", colorComponents);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
 	}
 	
 	private int createVAO(GUIComponent component) {
@@ -102,9 +120,7 @@ public class GUIRenderEngine {
 						image.getX()                    , image.getY() + image._getHeight(), 0, 0};
 		
 		int[] indices = new int[] {3, 1, 0, 3, 2, 1};
-		
-		System.out.println(Arrays.toString(data));
-		
+				
 		glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
 				
@@ -115,7 +131,30 @@ public class GUIRenderEngine {
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, Float.BYTES*4, Float.BYTES*2);
 	}
 	
+	private void loadFrameVAO(GUIFrame frame) {
+		int dataBuffer = glGenBuffers();
+		int attrBuffer = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, dataBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, attrBuffer);
+		
+		
+		float[] data = new float[] 
+					   {frame.getX(),                     frame.getY(),                     
+						frame.getX() + frame._getWidth(), frame.getY(),                    
+						frame.getX() + frame._getWidth(), frame.getY() + frame._getHeight(),
+						frame.getX()                    , frame.getY() + frame._getHeight()};
+		
+		int[] indices = new int[] {3, 1, 0, 3, 2, 1};
+				
+		glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+				
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, false, Float.BYTES*2, 0);
+	}
+	
 	private void loadLabelVAO(GUILabel label) {
-		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), 50, 50, "Thisi");
+		System.out.println(label.getX());
+		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), label.getX(), label.getY(), label.getText());
 	}
 }

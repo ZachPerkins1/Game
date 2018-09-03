@@ -16,20 +16,30 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.stb.STBTTFontinfo;
 
 public class Font {
 	private int size;
 	private String name;
 	private STBTTBakedChar.Buffer charInfo;
+	private STBTTFontinfo fontInfo;
 	private GLFontSheet texture;
 	private int start;
 	
-	public Font(String name, STBTTBakedChar.Buffer charInfo, GLFontSheet texture, int size, int start) {
+	private int ascent;
+	private int descent;
+	private int lineGap;
+	
+	public Font(String name, STBTTBakedChar.Buffer charInfo, STBTTFontinfo fontInfo,
+			GLFontSheet texture, int size, int start) {
 		this.name = name;
 		this.size = size;
 		this.charInfo = charInfo;
+		this.fontInfo = fontInfo;
 		this.texture = texture;
 		this.start = start;
+		
+		getMetrics();
 	}
 	
 	public void fillBuffers(int arrayBuffer, int elementArrayBuffer, int inX, int inY, String text) {
@@ -42,7 +52,7 @@ public class Font {
 		IntBuffer attrBuffer = IntBuffer.wrap(vaos);
 		
 		float[] x = new float[] {inX};
-		float[] y = new float[] {inY};
+		float[] y = new float[] {inY + ascent + descent};
 						
 		for (int i = 0; i < text.length(); i++) {
 			int c = text.charAt(i);
@@ -67,6 +77,35 @@ public class Font {
 		
 	}
 	
+	public int getHeight() {
+		return ascent + descent;
+	}
+	
+	public int getWidth(String s) {
+		float[] x = new float[] {0};
+		float[] y = new float[] {0};
+		
+		for (int i = 0; i < s.length(); i++) {
+			int c = s.charAt(i);
+			STBTTAlignedQuad quad = STBTTAlignedQuad.malloc();
+			stbtt_GetBakedQuad(charInfo, texture.getWidth(), texture.getHeight(), c - start, x, y, quad, true);
+		}
+		
+		return (int) x[0];
+	}
+	
+	public int getAscent() {
+		return ascent;
+	}
+	
+	public int getDescent() {
+		return descent;
+	}
+	
+	public int getLineGap() {
+		return lineGap;
+	}
+	
 	public GLFontSheet getTexture() {
 		return texture;
 	}
@@ -81,5 +120,19 @@ public class Font {
 	
 	public String getName() {
 		return name;
+	}
+	
+	private void getMetrics() {
+		// Dealing with Java's unfortunate lack of pointers
+		int[] a = new int[1];
+		int[] d = new int[1];
+		int[] l = new int[1];
+		
+		stbtt_GetFontVMetrics(fontInfo, a, d, l);
+		float scaleFactor = (((float)size)/(a[0]-d[0]));
+		
+		ascent = (int)(a[0] * scaleFactor);
+		descent = (int) (d[0] * scaleFactor);
+		lineGap = (int) (l[0] * scaleFactor);
 	}
 }

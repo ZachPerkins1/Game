@@ -24,6 +24,10 @@ public class GUIManager {
 		return master;
 	}
 	
+	public void update() {
+		master.update();
+	}
+	
 	private void render(GUIFrame frame) {
 		for (GUIComponent child : frame.getChildren()) {
 			if (child.getType() == GUITypeIdentifier.TYPE_FRAME) {

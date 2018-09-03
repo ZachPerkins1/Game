@@ -1,5 +1,6 @@
 package com.koowalk.shop.guis;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -7,6 +8,7 @@ import com.koowalk.shop.guis.GUITypeIdentifier;
 
 public class GUIFrame extends GUIComponent {
 	public ArrayList<GUIComponent> children;
+	private Color color;
 	
 	private GUILayout layoutManager;
 	
@@ -14,8 +16,13 @@ public class GUIFrame extends GUIComponent {
 		this(new GUILayoutAbsolute());
 	}
 	
-	public GUIFrame(GUILayout manager) {
+	public GUIFrame(GUILayout layout) {
+		this(layout, new Color(0,0,0,0));
+	}
+	
+	public GUIFrame(GUILayout manager, Color color) {
 		super(GUITypeIdentifier.TYPE_FRAME);
+		this.color = color;
 		children = new ArrayList<GUIComponent>();
 		layoutManager = manager;
 	}
@@ -38,5 +45,9 @@ public class GUIFrame extends GUIComponent {
 		for (GUIComponent child : children) {
 			child.update();
 		}
+	}
+	
+	public Color getColor() {
+		return color;
 	}
 }

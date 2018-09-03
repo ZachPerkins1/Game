@@ -25,15 +25,17 @@ public class FontLoader {
 		ByteBuffer imgBuffer = MemoryUtil.memAlloc(FONT_SHEET_WIDTH*1024);
 		STBTTBakedChar.Buffer charBuffer = STBTTBakedChar.malloc(max - min);
 		int maxHeight = stbtt_BakeFontBitmap(fontBuffer, size, imgBuffer, FONT_SHEET_WIDTH, 1024, min, charBuffer);
+		STBTTFontinfo fontInfo = STBTTFontinfo.malloc();
+		stbtt_InitFont(fontInfo, fontBuffer);
 		MemoryUtil.memFree(fontBuffer);
 		GLFontSheet tex = allocateTexture(imgBuffer, FONT_SHEET_WIDTH, maxHeight);
-		Font font = new Font(fontFile.substring(0, fontFile.length() - 4), charBuffer, tex, size, min);
+		Font font = new Font(fontFile.substring(0, fontFile.length() - 4), charBuffer, fontInfo, tex, size, min);
 		fonts.add(font);
 		return font;
 	}
 	
 	public Font load(String fontFile, int size) throws IOException {
-		return load(fontFile, size, 34, 128);
+		return load(fontFile, size, 32, 128);
 	}
 	
 	public Font getPreloaded(String fontName, int size) {

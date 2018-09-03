@@ -88,6 +88,10 @@ public class GLProgram {
 	public void setUniform2Vec(String name, float[] value) {
 		glUniform2fv(getUniformLocation(name), value);
 	}
+	
+	public void setUniform4Vec(String name, float[] value) {
+		glUniform4fv(getUniformLocation(name), value);
+	}
 
 	public void setUniform4Matrix(String name, float[] value) {
 		glUniformMatrix4fv(getUniformLocation(name), true, value);

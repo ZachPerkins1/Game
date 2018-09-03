@@ -12,6 +12,7 @@ import com.koowalk.shop.guis.GUIImage;
 import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUIManager;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.nio.*;
 import java.util.HashMap;
@@ -124,8 +125,8 @@ public class Window {
 		ChunkRenderEngine.create();
 		GUIImage img = new GUIImage(1);
 		HashMap<String, Object> attr = new HashMap<String, Object>();
-		attr.put("x", 0);
-		attr.put("y", 0);
+		attr.put("x", 50);
+		attr.put("y", 50);
 		img.setParent(GUIManager.getInstance().getMaster(), attr);
 		
 		try {
@@ -135,7 +136,7 @@ public class Window {
 		}
 		
 		try {
-			GUILabel label = new GUILabel("OpenSans-Regular", 20);
+			GUILabel label = new GUILabel("OpenSans-Regular", 20, "I like to eat ashwin asshole");
 			label.setParent(GUIManager.getInstance().getMaster(), attr);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -170,6 +171,7 @@ public class Window {
 			
 			glfwPollEvents();
 			game.update();
+			GUIManager.getInstance().update();
 			glClear(GL_COLOR_BUFFER_BIT); // clear the framebuffer
 			game.draw();
 			GUIManager.getInstance().draw();
