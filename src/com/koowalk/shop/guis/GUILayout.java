@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class GUILayout {
-	public ArrayList<GUILayoutComponent> components;
+	private ArrayList<GUILayoutComponent> components;
 	
 	public GUILayout() {
 		components = new ArrayList<GUILayoutComponent>();
@@ -13,6 +13,10 @@ public abstract class GUILayout {
 	public void add(GUILayoutComponent component, HashMap<String, Object> dict) {
 		component.setLayoutSettings(new GUILayoutSettingsAbsolute(dict));
 		components.add(component);
+	}
+	
+	public ArrayList<GUILayoutComponent> getComponents() {
+		return components;
 	}
 	
 	public abstract int getBoundingWidth();
