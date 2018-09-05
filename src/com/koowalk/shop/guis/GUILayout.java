@@ -10,8 +10,8 @@ public abstract class GUILayout {
 		components = new ArrayList<GUILayoutComponent>();
 	}
 	
-	public void add(GUILayoutComponent component, HashMap<String, Object> dict) {
-		component.setLayoutSettings(new GUILayoutSettingsAbsolute(dict));
+	public void add(GUILayoutComponent component, GUILayoutSettings settings) {
+		component.setLayoutSettings(settings);
 		components.add(component);
 	}
 	

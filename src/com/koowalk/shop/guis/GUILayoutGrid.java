@@ -3,6 +3,8 @@ package com.koowalk.shop.guis;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import com.koowalk.shop.guis.GUILayoutSettingsGrid.Sticky;
+
 public class GUILayoutGrid extends GUILayout {
 	private HashMap<Integer, Integer> rowDefaults;
 	private HashMap<Integer, Integer> columnDefaults;
@@ -35,11 +37,11 @@ public class GUILayoutGrid extends GUILayout {
 			int width = settings.getAdditionalWidth() + component.getPaddedWidth();
 			int height = settings.getAdditionalHeight() + component.getPaddedHeight();
 			
-			if (columnSizes.get(settings.column) < width)
+			if (columnSizes.getOrDefault(settings.column, 0) < width)
 				columnSizes.put(settings.column, width);
 			
-			if (rowSizes.get(settings.row) < height)
-				rowSizes.put(settings.row, height);	
+			if (rowSizes.getOrDefault(settings.row, 0) < height)
+				rowSizes.put(settings.row, height);
 		}
 		
 		for (Entry<Integer, Integer> data : rowDefaults.entrySet()) {
@@ -67,13 +69,31 @@ public class GUILayoutGrid extends GUILayout {
 	private void placeComponents(HashMap<Integer, Integer> rowSizes, HashMap<Integer, Integer> columnSizes) {
 		for (GUILayoutComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
+			int offset = 0;
 			for (int i = settings.column - 1; i >= 0; i--) {
-				component.x += columnSizes.getOrDefault(i, 0) + settings.marginLeft;
+				offset += columnSizes.getOrDefault(i, 0);
 			}
+			component.x = decideCoord(offset, columnSizes.get(settings.column), component.getPaddedWidth(), 
+					settings.marginLeft, settings.marginRight, settings.floatX);
+			// component.x += settings.marginLeft;
 			
+			offset = 0;
 			for (int i = settings.row - 1; i >= 0; i--) {
-				component.y += rowSizes.getOrDefault(i, 0) + settings.marginTop;
+				offset += rowSizes.getOrDefault(i, 0);
 			}
+			component.y = decideCoord(offset, rowSizes.get(settings.row), component.getPaddedHeight(), 
+					settings.marginTop, settings.marginBottom, settings.floatY);
+		}
+	}
+	
+	private int decideCoord(int offset, int gridSize, int componentSize, int marginPositive, int marginNegative, 
+			GUILayoutSettingsGrid.Sticky sticky) {
+		if (sticky == Sticky.POSITIVE) {
+			return offset + marginPositive;
+		} else if (sticky == Sticky.NEGATIVE) {
+			return offset + gridSize - componentSize - marginNegative;
+		} else {
+			return ((offset + gridSize) / 2) - ((componentSize + marginPositive + marginNegative) / 2) + marginPositive;
 		}
 	}
 

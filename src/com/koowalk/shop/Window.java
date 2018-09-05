@@ -11,6 +11,8 @@ import com.koowalk.shop.graphics.TextureRegistry;
 import com.koowalk.shop.guis.GUIFrame;
 import com.koowalk.shop.guis.GUIImage;
 import com.koowalk.shop.guis.GUILabel;
+import com.koowalk.shop.guis.GUILayoutSettingsAbsolute;
+import com.koowalk.shop.guis.GUILayoutSettingsGrid;
 import com.koowalk.shop.guis.GUIManager;
 
 import java.awt.Color;
@@ -26,9 +28,15 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
+import com.koowalk.shop.guis.GUILayoutSettingsGrid.Sticky;
+import com.koowalk.shop.util.Logger;
+
 public class Window {
 	public static int WIDTH = 800;
 	public static int HEIGHT = 800;
+	
+	private long timer;
+	private int frameCount;
 
 	// The window handle
 	private long window;
@@ -62,7 +70,9 @@ public class Window {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		GLFWErrorCallback.createPrint(System.err).set();
-
+		Logger.init();
+		
+		Logger.info("Initializing GLFW");
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if ( !glfwInit() )
 			throw new IllegalStateException("Unable to initialize GLFW");
@@ -74,6 +84,7 @@ public class Window {
 		glfwWindowHint(GLFW_SAMPLES, 4);
 
 		// Create the window
+		Logger.info("Creating window");
 		window = glfwCreateWindow(800, 800, "Hello World!", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
@@ -90,6 +101,7 @@ public class Window {
 		});
 		
 		glfwSetWindowCloseCallback(window, (window) -> {
+			Logger.finish();
 			game.windowClosing();
 		});
 		
@@ -122,21 +134,23 @@ public class Window {
 		GL.createCapabilities();
 		
 		// Load buffer data for chunk rendering
+		Logger.info("Loading textures");
 		loadTextures();
+		Logger.info("Loading chunk engine");
 		ChunkRenderEngine.create();
 		GUIImage img = new GUIImage(1);
-		HashMap<String, Object> attr = new HashMap<String, Object>();
-		attr.put("x", 50);
-		attr.put("y", 50);
-		HashMap<String, Object> attr2 = new HashMap<String, Object>();
-		attr2.put("x", 0);
-		attr2.put("y", 0);
 		
 		GUIFrame frame = new GUIFrame(Color.RED);
-		frame.setParent(GUIManager.getInstance().getMaster(), attr);
+		frame.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(0,0,0,0,0,0,Sticky.POSITIVE, Sticky.POSITIVE));
+		frame.setPadding(10);
+		
+		GUIFrame frame2 = new GUIFrame(Color.BLACK);
+		frame2.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,0,0,0,5,0, Sticky.NEUTRAL, Sticky.POSITIVE));
+		
 		// frame.setPadding(20);
 		// img.setParent(GUIManager.getInstance().getMaster(), attr);
 		
+		Logger.info("Loading fonts");
 		try {
 			FontLoader.getInstance().load("OpenSans-Regular.ttf", 20);
 		} catch (IOException e) {
@@ -144,8 +158,12 @@ public class Window {
 		}
 		
 		try {
-			GUILabel label = new GUILabel("OpenSans-Regular", 60, "Rutika");
-			label.setParent(frame, attr2);
+			GUILabel label = new GUILabel("OpenSans-Regular", 60, "Test");
+			label.setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
+			
+			frame2.setPadding(20);
+			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "Hello");
+			label2.setParent(frame2, new GUILayoutSettingsAbsolute(0,0));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -194,6 +212,18 @@ public class Window {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		    
+		    long currentTime = System.currentTimeMillis();
+		    if (currentTime - timer >= 1000*60) {
+		    	if (timer != 0) {
+		    		Logger.info("Average framerate is " + (frameCount * 1.0)/((currentTime - timer)/1000.0));
+		    	}
+		    	
+		    	timer = System.currentTimeMillis();
+		    	frameCount = 0;
+		    }
+		    
+		    frameCount++;
 		}
 	}
 	

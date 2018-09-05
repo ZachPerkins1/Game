@@ -7,5 +7,7 @@ public abstract class GUILayoutSettings {
 		load(dict);
 	}
 	
+	public GUILayoutSettings() {}
+	
 	public abstract void load(HashMap<String, Object> dict);
 }

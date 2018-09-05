@@ -124,7 +124,7 @@ public abstract class GUIComponent extends GUILayoutComponent {
 		return parent;
 	}
 	
-	public void setParent(GUIFrame parent, HashMap<String, Object> dict) {
+	public void setParent(GUIFrame parent, GUILayoutSettings dict) {
 		parent.add(this, dict);
 		this.parent = parent;
 	}

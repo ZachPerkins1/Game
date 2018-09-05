@@ -3,6 +3,12 @@ package com.koowalk.shop.guis;
 import java.util.HashMap;
 
 public class GUILayoutSettingsGrid extends GUILayoutSettings {
+	public enum Sticky {
+		NEGATIVE,
+		POSITIVE,
+		NEUTRAL
+	}
+	
 	int row;
 	int column;
 	int marginLeft;
@@ -10,8 +16,23 @@ public class GUILayoutSettingsGrid extends GUILayoutSettings {
 	int marginTop;
 	int marginBottom;
 	
+	Sticky floatX;
+	Sticky floatY;
+	
 	public GUILayoutSettingsGrid(HashMap<String, Object> dict) {
 		super(dict);
+	}
+	
+	public GUILayoutSettingsGrid(int row, int column, int marginLeft, int marginRight, 
+			int marginTop, int marginBottom, Sticky floatX, Sticky floatY) {
+		this.row = row;
+		this.column = column;
+		this.marginLeft = marginLeft;
+		this.marginRight = marginRight;
+		this.marginTop = marginTop;
+		this.marginBottom = marginBottom;
+		this.floatX = floatX;
+		this.floatY = floatY;
 	}
 
 	@Override

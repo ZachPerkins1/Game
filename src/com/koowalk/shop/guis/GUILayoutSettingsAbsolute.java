@@ -10,6 +10,11 @@ public class GUILayoutSettingsAbsolute extends GUILayoutSettings {
 		super(dict);
 	}
 	
+	public GUILayoutSettingsAbsolute(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	
 	public void load(HashMap<String, Object> dict) {
 		x = (Integer) dict.getOrDefault("x", 0);
 		y = (Integer) dict.getOrDefault("y", 0);

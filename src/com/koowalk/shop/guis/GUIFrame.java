@@ -31,9 +31,9 @@ public class GUIFrame extends GUIComponent {
 		layoutManager = manager;
 	}
 	
-	public void add(GUIComponent component, HashMap<String, Object> dict) {
+	public void add(GUIComponent component, GUILayoutSettings settings) {
 		children.add(component);
-		layoutManager.add(component, dict);
+		layoutManager.add(component, settings);
 	}
 	
 	public ArrayList<GUIComponent> getChildren() {
