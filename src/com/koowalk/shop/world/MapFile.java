@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 
+import com.koowalk.shop.util.Logger;
 import com.koowalk.shop.util.Point2D;
 import com.koowalk.shop.util.SortedArrayList;
 import com.koowalk.shop.util.SortedPoint2D;
@@ -30,7 +31,8 @@ public class MapFile {
 			mapDB = DriverManager.getConnection("jdbc:sqlite:" + save.toString() + "/" + MAP_NAME);
 			entityDB = DriverManager.getConnection("jdbc:sqlite:" + save.toString() + "/" + ENTITY_NAME);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Logger.error("Failed to open map db");
+			Logger.exception(e);
 		}
 		
 		setDefaults(mapDB);
@@ -40,7 +42,8 @@ public class MapFile {
 			createTables(mapDB, "map.sql");
 			createTables(entityDB, "entity.sql");
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
+			Logger.error("Failed to open map db");
+			Logger.exception(e);
 		}
 	}
 	
@@ -64,7 +67,6 @@ public class MapFile {
 		}
 		
 		reader.close();
-		System.out.println(query.toString());
 		statement.executeUpdate(query.toString());
 		statement.close();
 	}
@@ -163,9 +165,7 @@ public class MapFile {
 	public void loadChunk(Chunk c) throws SQLException {
 		ChunkInfo ci = getChunkData(c.x, c.y);
 		chunkInfo.addSorted(ci);
-		
-		// System.out.println(ci);
-		
+				
 		for (int i = 0; i < ci.getBlockCount(); i++) {
 			BlockInfo bi = ci.get(i);
 			c.place(bi.getLayer(), bi.getX(), bi.getY(), bi.getBlock());

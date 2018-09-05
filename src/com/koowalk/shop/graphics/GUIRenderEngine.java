@@ -7,7 +7,6 @@ import static org.lwjgl.opengl.GL30.*;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import com.koowalk.shop.guis.GUIComponent;
@@ -15,6 +14,7 @@ import com.koowalk.shop.guis.GUIFrame;
 import com.koowalk.shop.guis.GUIImage;
 import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUITypeIdentifier;
+import com.koowalk.shop.util.Logger;
 
 public class GUIRenderEngine {
 	public static final String SHADER_DIRECTORY = "gui_shaders/";
@@ -30,6 +30,7 @@ public class GUIRenderEngine {
 	}
 	
 	private void createPrograms() {
+		Logger.info("Loading GUI shader programs");
 		try {
 			programs = new GLProgram[GUITypeIdentifier.TYPE_COUNT];
 			for (int i = 0; i < programs.length; i++) {
@@ -51,6 +52,7 @@ public class GUIRenderEngine {
 		} else {
 			vao = createVAO(component);
 		}
+
 		
 		glBindVertexArray(vao);
 		programs[component.getType().getIndex()].use();
@@ -93,9 +95,9 @@ public class GUIRenderEngine {
 	}
 	
 	private int createVAO(GUIComponent component) {
+		Logger.info("Loading VAO for component with UID " + component.getUID());
 		int vao = glGenVertexArrays();
 		glBindVertexArray(vao);
-		
 		
 		if (component.getType() == GUITypeIdentifier.TYPE_IMAGE) {
 			loadImageVAO((GUIImage) component);
@@ -106,7 +108,6 @@ public class GUIRenderEngine {
 		}
 		
 		vaos.put(component.getUID(), vao);
-		System.out.println(component.getUID());
 		return vao;
 	}
 	
@@ -158,7 +159,6 @@ public class GUIRenderEngine {
 	}
 	
 	private void loadLabelVAO(GUILabel label) {
-		System.out.println(label.getX());
 		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), label.getPaddedX(), label.getPaddedY(), label.getText());
 	}
 }

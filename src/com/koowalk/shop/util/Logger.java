@@ -1,6 +1,5 @@
 package com.koowalk.shop.util;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,12 +7,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-import java.util.Date;
 
 public class Logger {
 	public static final int LOG_HISTORY_COUNT = 10;

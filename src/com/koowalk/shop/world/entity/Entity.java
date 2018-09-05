@@ -136,7 +136,6 @@ public class Entity {
 		closedList.add(current);
 				
 		while (!current.equals(target)) {
-			//System.out.println(current);
 			openList.addSurrounding(world, current, closedList, target);
 			
 			try {

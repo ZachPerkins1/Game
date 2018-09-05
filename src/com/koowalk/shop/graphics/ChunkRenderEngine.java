@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.lwjgl.opengl.GL20;
 
 import com.koowalk.shop.Statics;
+import com.koowalk.shop.util.Logger;
 import com.koowalk.shop.world.Camera;
 import com.koowalk.shop.world.World;
 import com.koowalk.shop.world.chunk.Block;
@@ -52,6 +53,7 @@ public class ChunkRenderEngine {
 	}
 	
 	private void initShaderProgram() {
+		Logger.info("Loading chunk render programs");
 		program = new GLProgram();
 		
 		try {
@@ -65,6 +67,7 @@ public class ChunkRenderEngine {
 	}
 	
 	private void initVAO() {
+		Logger.info("Buffering chunk vertices");
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 		
@@ -116,9 +119,7 @@ public class ChunkRenderEngine {
 				}
 			}
 		}
-		
-		//System.out.println(Arrays.toString(data));
-		
+				
 		int attrBuff = glGenBuffers();
 		blockBuffer = glGenBuffers();
 		
@@ -190,7 +191,6 @@ public class ChunkRenderEngine {
 		glBindVertexArray(vao);
 		program.use();
 		
-		
 		program.setUniformTranslationMatrix("offset", x*Chunk.P_SIZE, y*Chunk.P_SIZE);
 		camera.setUniforms(program);
 		
@@ -211,6 +211,7 @@ public class ChunkRenderEngine {
 	}
 	
 	public void load() {
+		Logger.info("Loading block textures");
 		blockTextures.load();
 		for (int i = 0; i < backdrops.length; i++) {
 			if (backdrops[i] != null) {

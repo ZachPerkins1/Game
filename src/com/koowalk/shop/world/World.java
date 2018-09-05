@@ -13,6 +13,7 @@ import com.koowalk.shop.Statics;
 import com.koowalk.shop.Util;
 import com.koowalk.shop.graphics.ChunkRenderEngine;
 import com.koowalk.shop.graphics.CompoundTexture;
+import com.koowalk.shop.util.Logger;
 import com.koowalk.shop.util.SortedPoint2D;
 import com.koowalk.shop.world.chunk.Block;
 import com.koowalk.shop.world.chunk.BlockEntity;
@@ -84,7 +85,7 @@ public class World {
 		try {
 			file.loadChunk(c);
 		} catch (SQLException e) {
-			System.out.println("No data found for chunk (" + c.x + ", " + c.y + ")");
+			Logger.warn("No data found for chunk (" + c.x + ", " + c.y + ")");
 		}
 		
 		chunks.addSorted(c);
@@ -282,8 +283,8 @@ public class World {
 		}
 		
 		if (counter == 60*60) {
+			Logger.info("Saving World");
 			saveChunks();
-			System.out.println("Saving map...");
 			counter = 0;
 		}
 		

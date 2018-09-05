@@ -7,6 +7,8 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import org.lwjgl.system.MemoryUtil;
 
+import com.koowalk.shop.util.Logger;
+
 import org.lwjgl.stb.*;
 import static org.lwjgl.stb.STBTruetype.*;
 
@@ -21,6 +23,7 @@ public class FontLoader {
 	}
 	
 	public Font load(String fontFile, int size, int min, int max) throws IOException {
+		Logger.info("Loading font: " + fontFile + " @ size " + size);
 		ByteBuffer fontBuffer = readFontFile(fontFile);
 		ByteBuffer imgBuffer = MemoryUtil.memAlloc(FONT_SHEET_WIDTH*1024);
 		STBTTBakedChar.Buffer charBuffer = STBTTBakedChar.malloc(max - min);

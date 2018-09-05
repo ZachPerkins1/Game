@@ -34,7 +34,6 @@ public class GLTextureArray implements LoadableTexture {
 	public void load() {		
 		glId = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D_ARRAY, glId);
-		System.out.println(glId);
 		
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);	
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -5,6 +5,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 import com.koowalk.shop.pathfinding.InvalidPathException;
+import com.koowalk.shop.util.Logger;
 import com.koowalk.shop.world.Camera;
 import com.koowalk.shop.world.World;
 import com.koowalk.shop.world.entity.Entity;
@@ -30,9 +31,11 @@ public class Game {
 	public Game() {
 		movement = new boolean[4];
 		
+		Logger.info("Loading world file");
 		GameFile g = new GameFile("test");
 		world = new World(g.getMap());
 		
+		Logger.info("Loading player");
 		player = new Player(world, 100, 300);
 		world.addEntity(player);
 		c = world.getCamera();
