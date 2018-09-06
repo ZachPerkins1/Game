@@ -1,49 +1,35 @@
 package com.koowalk.shop.guis;
 
-import java.util.HashMap;
-
-public abstract class GUIComponent extends GUILayoutComponent {
-	private GUIComponent parent = null;
-	private int width;
-	private int height;
+public abstract class GUIComponent {
+	private GUIFrame parent = null;
 	
 	private int pLeft;
 	private int pRight;
 	private int pTop;
 	private int pBottom;
 	
+	private static int uidCounter = 0;
+	private GUILayoutSettings settings;
+	private long uid;
+	
+	public int x;
+	public int y;
+	
 	private GUITypeIdentifier type;
 	
 	public GUIComponent(GUITypeIdentifier type) {
+		uid = uidCounter;
+		uidCounter++;
 		this.type = type;
 	}
 	
-	public int _getWidth() {
-		if (width > 0) {
-			return width;
-		}
-		
-		return getWidth();
-	}
-	
-	public int _getHeight() {
-		if (height > 0) {
-			return height;
-		}
-		
-		return getHeight();
-	}
-	
 	public int getPaddedWidth() {
-		return _getWidth() + pLeft + pRight;
+		return getWidth() + pLeft + pRight;
 	}
 	
 	public int getPaddedHeight() {
-		return _getHeight() + pTop + pBottom;
+		return getHeight() + pTop + pBottom;
 	}
-	
-	public int getWidth() { return width; }
-	public int getHeight() { return height; }
 	
 	public int getX() {
 		if (parent != null) {
@@ -120,7 +106,7 @@ public abstract class GUIComponent extends GUILayoutComponent {
 		return type;
 	}
 	
-	public GUIComponent getParent() {
+	public GUIFrame getParent() {
 		return parent;
 	}
 	
@@ -129,5 +115,23 @@ public abstract class GUIComponent extends GUILayoutComponent {
 		this.parent = parent;
 	}
 	
+	public GUILayoutSettings getLayoutSettings() {
+		return settings;
+	}
+	
+	public void setLayoutSettings(GUILayoutSettings settings) {
+		this.settings = settings;
+	}
+	
+	public boolean equals(GUIComponent other) {
+		return this.uid == other.getUID();
+	}
+	
+	public long getUID() {
+		return uid;
+	}
+	
+	public abstract int getWidth();
+	public abstract int getHeight();
 	public void update() {};
 }

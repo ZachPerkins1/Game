@@ -1,14 +1,16 @@
 package com.koowalk.shop.guis;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.koowalk.shop.guis.GUITypeIdentifier;
 
 public class GUIFrame extends GUIComponent {
 	public ArrayList<GUIComponent> children;
 	private Color color;
+	private DimensionMeasurement width;
+	private DimensionMeasurement height;
 	
 	private GUILayout layoutManager;
 	
@@ -29,6 +31,8 @@ public class GUIFrame extends GUIComponent {
 		this.color = color;
 		children = new ArrayList<GUIComponent>();
 		layoutManager = manager;
+		width = new DimensionMeasurement();
+		height = new DimensionMeasurement();
 	}
 	
 	public void add(GUIComponent component, GUILayoutSettings settings) {
@@ -38,6 +42,10 @@ public class GUIFrame extends GUIComponent {
 	
 	public ArrayList<GUIComponent> getChildren() {
 		return children;
+	}
+	
+	public Dimension getChildAlottedDimensions(GUIComponent child) {
+		return null;
 	}
 	
 	public void setLayoutManager(GUILayout manager) {
@@ -57,10 +65,28 @@ public class GUIFrame extends GUIComponent {
 	}
 	
 	public int getWidth() {
-		return layoutManager.getBoundingWidth();
+		if (width.getMode() == DimensionMeasurement.Mode.AUTO) {
+			return layoutManager.getBoundingWidth();
+		} else if (width.getMode() == DimensionMeasurement.Mode.RELATIVE) {
+			if (getParent().getWidthMeasurement().getMode() == DimensionMeasurement.Mode.AUTO) {
+				return 0;
+			} else {
+				return width.get(getParent().getWidth());
+			}
+		} else {
+			return width.get();
+		}
 	}
 	
 	public int getHeight() {
 		return layoutManager.getBoundingHeight();
+	}
+	
+	public DimensionMeasurement getWidthMeasurement() {
+		return width;
+	}
+	
+	public DimensionMeasurement getHeightMeasurement() {
+		return height;
 	}
 }

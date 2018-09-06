@@ -120,9 +120,9 @@ public class GUIRenderEngine {
 		
 		float[] data = new float[] 
 					   {image.getPaddedX(),                     image.getPaddedY(),                      0, 1,
-						image.getPaddedX() + image._getWidth(), image.getPaddedY(),                      1, 1,
-						image.getPaddedX() + image._getWidth(), image.getPaddedY() + image._getHeight(), 1, 0,
-						image.getPaddedX()                    , image.getPaddedY() + image._getHeight(), 0, 0};
+						image.getPaddedX() + image.getWidth(), image.getPaddedY(),                      1, 1,
+						image.getPaddedX() + image.getWidth(), image.getPaddedY() + image.getHeight(), 1, 0,
+						image.getPaddedX()                    , image.getPaddedY() + image.getHeight(), 0, 0};
 		
 		int[] indices = new int[] {3, 1, 0, 3, 2, 1};
 				

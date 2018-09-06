@@ -1,5 +1,6 @@
 package com.koowalk.shop.guis;
 
+import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -32,7 +33,7 @@ public class GUILayoutGrid extends GUILayout {
 		HashMap<Integer, Integer> columnSizes = new HashMap<Integer, Integer>(columnDefaults);
 		HashMap<Integer, Integer> rowSizes = new HashMap<Integer, Integer>(rowDefaults);
 		
-		for (GUILayoutComponent component : getComponents()) {
+		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
 			int width = settings.getAdditionalWidth() + component.getPaddedWidth();
 			int height = settings.getAdditionalHeight() + component.getPaddedHeight();
@@ -67,7 +68,7 @@ public class GUILayoutGrid extends GUILayout {
 	}
 	
 	private void placeComponents(HashMap<Integer, Integer> rowSizes, HashMap<Integer, Integer> columnSizes) {
-		for (GUILayoutComponent component : getComponents()) {
+		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
 			int offset = 0;
 			for (int i = settings.column - 1; i >= 0; i--) {
@@ -93,8 +94,13 @@ public class GUILayoutGrid extends GUILayout {
 		} else if (sticky == Sticky.NEGATIVE) {
 			return offset + gridSize - componentSize - marginNegative;
 		} else {
-			return ((offset + gridSize) / 2) - ((componentSize + marginPositive + marginNegative) / 2) + marginPositive;
+			return ((offset + (gridSize / 2))) - ((componentSize + marginPositive + marginNegative) / 2) + marginPositive;
 		}
 	}
 
+	@Override
+	public Dimension getComponentAlottedDimensions(GUIComponent component) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
