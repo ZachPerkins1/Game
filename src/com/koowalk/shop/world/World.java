@@ -94,6 +94,7 @@ public class World {
 	
 	// Unload and save all the currently loaded chunks
 	public void saveChunks() {
+		Logger.info("Saving world");
 		for (SortedPoint2D c : chunks) {
 			Chunk chunk = (Chunk) c;
 			
@@ -283,7 +284,6 @@ public class World {
 		}
 		
 		if (counter == 60*60) {
-			Logger.info("Saving World");
 			saveChunks();
 			counter = 0;
 		}

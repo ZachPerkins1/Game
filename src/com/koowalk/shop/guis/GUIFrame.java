@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 
 import com.koowalk.shop.guis.GUITypeIdentifier;
+import com.koowalk.shop.util.Dim;
 
 public class GUIFrame extends GUIComponent {
 	public ArrayList<GUIComponent> children;
@@ -65,21 +66,27 @@ public class GUIFrame extends GUIComponent {
 	}
 	
 	public int getWidth() {
-		if (width.getMode() == DimensionMeasurement.Mode.AUTO) {
-			return layoutManager.getBoundingWidth();
-		} else if (width.getMode() == DimensionMeasurement.Mode.RELATIVE) {
-			if (getParent().getWidthMeasurement().getMode() == DimensionMeasurement.Mode.AUTO) {
-				return 0;
-			} else {
-				return width.get(getParent().getWidth());
-			}
-		} else {
-			return width.get();
-		}
+		return getDimension(Dim.X);
 	}
 	
 	public int getHeight() {
-		return layoutManager.getBoundingHeight();
+		return getDimension(Dim.Y);
+	}
+	
+	private int getDimension(Dim d) {
+		DimensionMeasurement m = getDimensionMeasurementByDim(d);
+		
+		if (m.getMode() == DimensionMeasurement.Mode.AUTO) {
+			return layoutManager.getBoundingByDim(d);
+		} else if (m.getMode() == DimensionMeasurement.Mode.RELATIVE) {
+			if (getParent().getDimensionMeasurementByDim(d).getMode() == DimensionMeasurement.Mode.AUTO) {
+				return 0;
+			} else {
+				return m.get(getParent().getDimensionByDim(d));
+			}
+		} else {
+			return m.get();
+		}
 	}
 	
 	public DimensionMeasurement getWidthMeasurement() {
@@ -88,5 +95,15 @@ public class GUIFrame extends GUIComponent {
 	
 	public DimensionMeasurement getHeightMeasurement() {
 		return height;
+	}
+	
+	public DimensionMeasurement getDimensionMeasurementByDim(Dim d) {
+		if (d == Dim.X) {
+			return getWidthMeasurement();
+		} else if (d == Dim.Y) {
+			return getHeightMeasurement();
+		}
+		
+		return null;
 	}
 }

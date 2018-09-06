@@ -1,5 +1,7 @@
 package com.koowalk.shop.guis;
 
+import com.koowalk.shop.util.Dim;
+
 public abstract class GUIComponent {
 	private GUIFrame parent = null;
 	
@@ -29,6 +31,16 @@ public abstract class GUIComponent {
 	
 	public int getPaddedHeight() {
 		return getHeight() + pTop + pBottom;
+	}
+	
+	public int getDimensionByDim(Dim d) {
+		if (d == Dim.X) {
+			return getWidth();
+		} else if (d == Dim.Y) {
+			return getHeight();
+		}
+		
+		return 0;
 	}
 	
 	public int getX() {

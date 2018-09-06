@@ -101,8 +101,11 @@ public class Window {
 		});
 		
 		glfwSetWindowCloseCallback(window, (window) -> {
-			Logger.finish();
+			Logger.info("Window close detected");
+			Logger.info("Saving gamestate");
 			game.windowClosing();
+			Logger.info("Saving log (I wish I could stay longer)");
+			Logger.finish();
 		});
 		
 		glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
