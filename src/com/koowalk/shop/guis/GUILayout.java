@@ -36,5 +36,17 @@ public abstract class GUILayout {
 	}
 	
 	public abstract void update();
-	public abstract Dimension getComponentAlottedDimensions(GUIComponent component);
+	
+	public int getComponentAlottedDimension(GUIComponent component, Dim d) {
+		if (d == Dim.X) {
+			return getComponentAlottedWidth(component);
+		} else if (d == Dim.Y) {
+			return getComponentAlottedHeight(component);
+		}
+		
+		return 0;
+	}
+	
+	public abstract int getComponentAlottedWidth(GUIComponent component);
+	public abstract int getComponentAlottedHeight(GUIComponent component);
 }

@@ -5,5 +5,8 @@ package com.koowalk.shop.util;
 public enum Dim {
 	X,
 	Y,
-	Z
+	Z;
+	
+	public static final Dim[] DIMENSIONS_2D = new Dim[] {X, Y};
+	public static final Dim[] DIMENSIONS_3D = new Dim[] {X, Y, Z};
 }

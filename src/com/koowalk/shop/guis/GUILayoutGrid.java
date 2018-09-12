@@ -1,10 +1,11 @@
 package com.koowalk.shop.guis;
 
-import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.koowalk.shop.guis.GUILayoutSettingsGrid.Sticky;
+import com.koowalk.shop.util.Dim;
 
 public class GUILayoutGrid extends GUILayout {
 	private HashMap<Integer, Integer> rowDefaults;
@@ -30,13 +31,13 @@ public class GUILayoutGrid extends GUILayout {
 
 	@Override
 	public void update() {
-		HashMap<Integer, Integer> columnSizes = new HashMap<Integer, Integer>(columnDefaults);
-		HashMap<Integer, Integer> rowSizes = new HashMap<Integer, Integer>(rowDefaults);
-		
+		HashMap<Integer, Integer> columnSizes = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> rowSizes = new HashMap<Integer, Integer>();
+				
 		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
 			int width = settings.getAdditionalWidth() + component.getPaddedWidth();
-			int height = settings.getAdditionalHeight() + component.getPaddedHeight();
+			int height = settings.getAdditionalHeight() + component.getPaddedHeight();			
 			
 			if (columnSizes.getOrDefault(settings.column, 0) < width)
 				columnSizes.put(settings.column, width);
@@ -45,14 +46,7 @@ public class GUILayoutGrid extends GUILayout {
 				rowSizes.put(settings.row, height);
 		}
 		
-		for (Entry<Integer, Integer> data : rowDefaults.entrySet()) {
-			rowSizes.put(data.getKey(), data.getValue());
-		}
-		
-		for (Entry<Integer, Integer> data : columnDefaults.entrySet()) {
-			columnSizes.put(data.getKey(), data.getValue());
-		}
-		
+		applyDefaults(rowSizes, columnSizes);
 		placeComponents(rowSizes, columnSizes);
 		totalSizes(rowSizes, columnSizes);
 	}
@@ -66,7 +60,7 @@ public class GUILayoutGrid extends GUILayout {
 		for (int i : rowSizes.values()) 
 			totalHeight += i;
 	}
-	
+		
 	private void placeComponents(HashMap<Integer, Integer> rowSizes, HashMap<Integer, Integer> columnSizes) {
 		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
@@ -97,10 +91,32 @@ public class GUILayoutGrid extends GUILayout {
 			return ((offset + (gridSize / 2))) - ((componentSize + marginPositive + marginNegative) / 2) + marginPositive;
 		}
 	}
+	
+	private void applyDefaults(HashMap<Integer, Integer> rowSizes, HashMap<Integer, Integer> columnSizes) {
+		for (Entry<Integer, Integer> data : columnDefaults.entrySet()) {
+			columnSizes.put(data.getKey(), data.getValue());
+		}
+		
+		for (Entry<Integer, Integer> data : rowDefaults.entrySet()) {
+			rowSizes.put(data.getKey(), data.getValue());
+		}
+	}
 
 	@Override
-	public Dimension getComponentAlottedDimensions(GUIComponent component) {
+	public int getComponentAlottedDimension(GUIComponent component, Dim d) {
 		// TODO Auto-generated method stub
-		return null;
+		return 0;
+	}
+
+	@Override
+	public int getComponentAlottedWidth(GUIComponent component) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getComponentAlottedHeight(GUIComponent component) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

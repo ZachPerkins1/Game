@@ -1,6 +1,6 @@
 package com.koowalk.shop.guis;
 
-public class DimensionMeasurement {
+public class DimensionMeasurement implements Dimension {
 	// Defines the dimension mode
 	public enum Mode {
 		ABSOLUTE, // Defined by absolute pixel values
@@ -8,14 +8,20 @@ public class DimensionMeasurement {
 		AUTO      // Defined by its contents
 	}
 	
+	private DimensionMeasurement parent;
 	private Mode mode;
 	private int absolute;
 	private double relative;
 	
-	public DimensionMeasurement() {
-		mode = Mode.AUTO;
+	public DimensionMeasurement(Mode m) {
+		mode = m;
 		absolute = 0;
 		relative = 0;
+		this.parent = null;
+	}
+	
+	public DimensionMeasurement() {
+		this(Mode.AUTO);
 	}
 	
 	public void setAbsolute(int absolute) {
@@ -30,17 +36,16 @@ public class DimensionMeasurement {
 		return mode;
 	}
 	
-	public int get(int parent) {
-		if (mode == Mode.ABSOLUTE) {
-			return absolute;
-		} else if (mode == Mode.RELATIVE) {
-			return (int)((relative/100)*parent);
-		}
-		
-		return 0;
+	public void setParent(DimensionMeasurement parent) {
+		this.parent = parent;
 	}
 	
 	public int get() {
-		return get(0);
+		if (mode == Mode.ABSOLUTE) 
+			return absolute;
+		else if (mode == Mode.RELATIVE)
+			return (int)(parent.get()*relative);
+		
+		return 0;
 	}
 }

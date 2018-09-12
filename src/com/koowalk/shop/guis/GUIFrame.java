@@ -45,8 +45,13 @@ public class GUIFrame extends GUIComponent {
 		return children;
 	}
 	
-	public Dimension getChildAlottedDimensions(GUIComponent child) {
-		return null;
+	public int getChildAlottedDimension(GUIComponent child, Dim d) {
+		if (getDimensionMeasurementByDim(d).getMode() == DimensionMeasurement.Mode.AUTO) {
+			
+		}
+		
+		layoutManager.getComponentAlottedDimension(child, d);
+		return 0;
 	}
 	
 	public void setLayoutManager(GUILayout manager) {
@@ -79,11 +84,7 @@ public class GUIFrame extends GUIComponent {
 		if (m.getMode() == DimensionMeasurement.Mode.AUTO) {
 			return layoutManager.getBoundingByDim(d);
 		} else if (m.getMode() == DimensionMeasurement.Mode.RELATIVE) {
-			if (getParent().getDimensionMeasurementByDim(d).getMode() == DimensionMeasurement.Mode.AUTO) {
-				return 0;
-			} else {
-				return m.get(getParent().getDimensionByDim(d));
-			}
+			return getParent().getChildAlottedDimension(this, d);
 		} else {
 			return m.get();
 		}

@@ -19,6 +19,9 @@ public abstract class GUIComponent {
 	
 	private GUITypeIdentifier type;
 	
+	private DimensionMeasurement width;
+	private DimensionMeasurement height;
+	
 	public GUIComponent(GUITypeIdentifier type) {
 		uid = uidCounter;
 		uidCounter++;
@@ -43,14 +46,23 @@ public abstract class GUIComponent {
 		return 0;
 	}
 	
+	public DimensionMeasurement getDimensionMeasurementByDim(Dim d) {
+		if (d == Dim.X) {
+			return width;
+		} else if (d == Dim.Y) {
+			return height;
+		}
+		
+		return null;
+	}
+	
 	public int getX() {
 		if (parent != null) {
 			return x + parent.getPaddedX();
 		}
 		
 		return x;
-	}
-	
+	}	
 	public int getY() {
 		if (parent != null) {
 			return y + parent.getPaddedY();

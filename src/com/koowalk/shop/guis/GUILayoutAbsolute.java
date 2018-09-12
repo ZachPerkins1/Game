@@ -2,6 +2,8 @@ package com.koowalk.shop.guis;
 
 import java.awt.Dimension;
 
+import com.koowalk.shop.util.Dim;
+
 public class GUILayoutAbsolute extends GUILayout {
 	private int maxWidth = 0;
 	private int maxHeight = 0;
@@ -18,6 +20,8 @@ public class GUILayoutAbsolute extends GUILayout {
 				
 			if (height > maxHeight) maxHeight = height;
 			if (width > maxWidth) maxWidth = width;
+			
+			component.update();
 		}
 	}
 
@@ -32,8 +36,12 @@ public class GUILayoutAbsolute extends GUILayout {
 	}
 
 	@Override
-	public Dimension getComponentAlottedDimensions(GUIComponent component) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getComponentAlottedWidth(GUIComponent component) {
+		return 0;
+	}
+
+	@Override
+	public int getComponentAlottedHeight(GUIComponent component) {
+		return 0;
 	}
 }
