@@ -10,8 +10,6 @@ import com.koowalk.shop.util.Dim;
 public class GUIFrame extends GUIComponent {
 	public ArrayList<GUIComponent> children;
 	private Color color;
-	private DimensionMeasurement width;
-	private DimensionMeasurement height;
 	
 	private GUILayout layoutManager;
 	
@@ -32,8 +30,6 @@ public class GUIFrame extends GUIComponent {
 		this.color = color;
 		children = new ArrayList<GUIComponent>();
 		layoutManager = manager;
-		width = new DimensionMeasurement();
-		height = new DimensionMeasurement();
 	}
 	
 	public void add(GUIComponent component, GUILayoutSettings settings) {
@@ -43,15 +39,6 @@ public class GUIFrame extends GUIComponent {
 	
 	public ArrayList<GUIComponent> getChildren() {
 		return children;
-	}
-	
-	public int getChildAlottedDimension(GUIComponent child, Dim d) {
-		if (getDimensionMeasurementByDim(d).getMode() == DimensionMeasurement.Mode.AUTO) {
-			
-		}
-		
-		layoutManager.getComponentAlottedDimension(child, d);
-		return 0;
 	}
 	
 	public void setLayoutManager(GUILayout manager) {
@@ -64,47 +51,19 @@ public class GUIFrame extends GUIComponent {
 		}
 		
 		layoutManager.update();
+		this.getWidthMeasurement().setAuto(layoutManager.getBoundingWidth());
+		this.getHeightMeasurement().setAuto(layoutManager.getBoundingHeight());
+	}
+	
+	public void place() {
+		for (GUIComponent child : children) {
+			child.place();
+		}
+		
+		layoutManager.place();
 	}
 	
 	public Color getColor() {
 		return color;
-	}
-	
-	public int getWidth() {
-		return getDimension(Dim.X);
-	}
-	
-	public int getHeight() {
-		return getDimension(Dim.Y);
-	}
-	
-	private int getDimension(Dim d) {
-		DimensionMeasurement m = getDimensionMeasurementByDim(d);
-		
-		if (m.getMode() == DimensionMeasurement.Mode.AUTO) {
-			return layoutManager.getBoundingByDim(d);
-		} else if (m.getMode() == DimensionMeasurement.Mode.RELATIVE) {
-			return getParent().getChildAlottedDimension(this, d);
-		} else {
-			return m.get();
-		}
-	}
-	
-	public DimensionMeasurement getWidthMeasurement() {
-		return width;
-	}
-	
-	public DimensionMeasurement getHeightMeasurement() {
-		return height;
-	}
-	
-	public DimensionMeasurement getDimensionMeasurementByDim(Dim d) {
-		if (d == Dim.X) {
-			return getWidthMeasurement();
-		} else if (d == Dim.Y) {
-			return getHeightMeasurement();
-		}
-		
-		return null;
 	}
 }

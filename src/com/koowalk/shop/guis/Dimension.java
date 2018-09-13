@@ -7,6 +7,10 @@ public abstract class Dimension {
 		return Dimension.add(this, new SimpleDimension(c));
 	}
 	
+	public String toString() {
+		return "Dimension [size = " + get() + "]";
+	}
+	
 	public static DimensionAdder add(Dimension a, Dimension b) {
 		return new DimensionAdder(a, b);
 	}

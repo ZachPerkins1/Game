@@ -14,7 +14,7 @@ public class GUIManager {
 	private GUIFrame master;
 	
 	public GUIManager() {
-		master = new GUIFrame(new GUILayoutGrid(), Color.BLUE);
+		master = new GUIFrame(new GUILayoutAbsolute(), Color.BLUE);
 		renderEngine = new GUIRenderEngine();
 	}
 	
@@ -28,6 +28,7 @@ public class GUIManager {
 	
 	public void update() {
 		master.update();
+		master.place();
 	}
 	
 	private void render(GUIFrame frame) {
@@ -45,6 +46,7 @@ public class GUIManager {
 	
 	public void issueLayoutUpdates() {
 		master.update();
+		master.place();
 	}
 	
 	public static GUIManager getInstance() {

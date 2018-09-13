@@ -11,15 +11,12 @@ public class GUIImage extends GUIComponent {
 		image = (GLTexture) TextureRegistry.get(id);
 	}
 	
-	public int getWidth() {
-		return image.getWidth();
-	}
-	
-	public int getHeight() {
-		return image.getHeight();
-	}
-	
 	public GLTexture getImage() {
 		return image;
+	}
+	
+	public void update() {
+		this.getWidthMeasurement().setAuto(image.getWidth());
+		this.getHeightMeasurement().setAuto(image.getHeight());
 	}
 }

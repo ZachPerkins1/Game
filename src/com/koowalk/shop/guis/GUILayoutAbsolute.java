@@ -10,6 +10,22 @@ public class GUILayoutAbsolute extends GUILayout {
 	
 	@Override
 	public void update() {
+		
+	}
+
+	@Override
+	public int getBoundingWidth() {
+		System.out.println(maxWidth);
+		return maxWidth;
+	}
+
+	@Override
+	public int getBoundingHeight() {
+		return maxHeight;
+	}
+
+	@Override
+	public void place() {
 		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsAbsolute settings = (GUILayoutSettingsAbsolute) component.getLayoutSettings();
 			component.x = settings.x;
@@ -20,18 +36,6 @@ public class GUILayoutAbsolute extends GUILayout {
 				
 			if (height > maxHeight) maxHeight = height;
 			if (width > maxWidth) maxWidth = width;
-			
-			component.update();
 		}
-	}
-
-	@Override
-	public int getBoundingWidth() {
-		return maxWidth;
-	}
-
-	@Override
-	public int getBoundingHeight() {
-		return maxHeight;
 	}
 }

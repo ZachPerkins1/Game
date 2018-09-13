@@ -23,6 +23,9 @@ public abstract class GUIComponent {
 	private DimensionMeasurement height;
 	
 	public GUIComponent(GUITypeIdentifier type) {
+		width = new DimensionMeasurement();
+		height = new DimensionMeasurement();
+		
 		uid = uidCounter;
 		uidCounter++;
 		this.type = type;
@@ -32,28 +35,60 @@ public abstract class GUIComponent {
 		return getWidth() + pLeft + pRight;
 	}
 	
+	public int getPaddingX() {
+		return pLeft + pRight;
+	}
+	
 	public int getPaddedHeight() {
 		return getHeight() + pTop + pBottom;
 	}
 	
-	public int getDimensionByDim(Dim d) {
+	public int getPaddingY() {
+		return pBottom + pTop;
+	}
+	
+	public DimensionMeasurement getWidthMeasurement() {
+		return width;
+	}
+	
+	public DimensionMeasurement getHeightMeasurement() {
+		return height;
+	}
+	
+	public int getWidth() {
+		return getDimensionMeasurementByDim(Dim.X).get();
+	}
+	
+	public int getHeight() {
+		return getDimensionMeasurementByDim(Dim.Y).get();
+	}
+	
+	public int getPaddingByDim(Dim d) {
 		if (d == Dim.X) {
-			return getWidth();
+			return getPaddingX();
 		} else if (d == Dim.Y) {
-			return getHeight();
+			return getPaddingY();
 		}
 		
 		return 0;
 	}
 	
+	public int getDimensionByDim(Dim d) {
+		return getDimensionMeasurementByDim(d).get();
+	}
+	
 	public DimensionMeasurement getDimensionMeasurementByDim(Dim d) {
 		if (d == Dim.X) {
-			return width;
+			return getWidthMeasurement();
 		} else if (d == Dim.Y) {
-			return height;
+			return getHeightMeasurement();
 		}
 		
 		return null;
+	}
+	
+	public Dimension getPaddedDimension(Dim d) {
+		return getDimensionMeasurementByDim(d).add(getPaddingByDim(d));
 	}
 	
 	public int getX() {
@@ -155,7 +190,6 @@ public abstract class GUIComponent {
 		return uid;
 	}
 	
-	public abstract int getWidth();
-	public abstract int getHeight();
 	public void update() {};
+	public void place() {};
 }

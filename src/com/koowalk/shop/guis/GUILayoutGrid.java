@@ -11,7 +11,11 @@ import com.koowalk.shop.util.Dim;
 public class GUILayoutGrid extends GUILayout {
 	public static class TableMap extends HashMap<Integer, Container<Dimension>> {
 		public Dimension get(int i) {
-			return super.get(i).get();
+			try {
+				return super.get(i).get();
+			} catch (Exception e) {
+				return null;
+			}
 		}
 		
 		public int getValue(int i) {
@@ -46,10 +50,7 @@ public class GUILayoutGrid extends GUILayout {
 	
 	private TableMap columnSizes;
 	private TableMap rowSizes;
-	
-	private int totalWidth;
-	private int totalHeight;
-	
+		
 	public GUILayoutGrid() {
 		rowDefaults = new TableMap();
 		columnDefaults = new TableMap();
@@ -57,12 +58,12 @@ public class GUILayoutGrid extends GUILayout {
  
 	@Override
 	public int getBoundingWidth() {
-		return totalWidth;
+		return totalSize(rowSizes);
 	}
 
 	@Override
 	public int getBoundingHeight() {
-		return totalHeight;
+		return totalSize(columnSizes);
 	}
 
 	@Override
@@ -77,9 +78,9 @@ public class GUILayoutGrid extends GUILayout {
 			DimensionMeasurement height = component.getDimensionMeasurementByDim(Dim.Y);
 			
 			setMaxInDimension(columnSizes, settings.column, 
-					width.add(settings.getAdditionalWidth() + component.getPaddedWidth()));
+					width.add(settings.getAdditionalWidth() + component.getPaddingX()));
 			setMaxInDimension(rowSizes, settings.row, 
-					height.add(settings.getAdditionalHeight() + component.getPaddedHeight()));
+					height.add(settings.getAdditionalHeight() + component.getPaddingY()));
 			
 			width.setParent(columnSizes.getContainer(settings.column));
 			height.setParent(rowSizes.getContainer(settings.row));
@@ -91,23 +92,18 @@ public class GUILayoutGrid extends GUILayout {
 	@Override
 	public void place() {
 		placeComponents();
-		totalSizes();
 	}
 	
-	private void totalSizes() {
-		totalWidth = 0;
-		totalHeight = 0;
+	private int totalSize(TableMap table) {
+		int totalSize = 0;
 		
-		for (int i : columnSizes.keySet())
-			totalWidth += columnSizes.get(i).get();
-		for (int i : rowSizes.keySet()) 
-			totalHeight += rowSizes.get(i).get();
+		for (int i : table.keySet())
+			totalSize += columnSizes.getValueOrDefault(i, 0);
+		
+		return totalSize;
 	}
 		
 	private void placeComponents() {
-		totalWidth = 0;
-		totalHeight = 0;
-		
 		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
 			int offset = 0;

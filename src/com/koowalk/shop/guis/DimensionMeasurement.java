@@ -34,6 +34,12 @@ public class DimensionMeasurement extends Dimension {
 		this.relative = relative;
 	}
 	
+	public void setAuto(int measurement) {
+		if (mode == Mode.AUTO) {
+			this.absolute = measurement;
+		}
+	}
+	
 	public Mode getMode() {
 		return mode;
 	}
@@ -43,11 +49,14 @@ public class DimensionMeasurement extends Dimension {
 	}
 	
 	public int get() {
-		if (mode == Mode.ABSOLUTE) 
-			return absolute;
-		else if (mode == Mode.RELATIVE)
-			return (int)(parent.get().get()*relative);
+		if (mode == Mode.RELATIVE) {
+			try {
+				return (int)(parent.get().get()*relative);
+			} catch (Exception e) {
+				return 0;
+			}
+		}
 		
-		return 0;
+		return absolute;
 	}
 }
