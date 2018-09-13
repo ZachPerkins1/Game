@@ -5,18 +5,54 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.koowalk.shop.guis.GUILayoutSettingsGrid.Sticky;
+import com.koowalk.shop.util.Container;
 import com.koowalk.shop.util.Dim;
 
 public class GUILayoutGrid extends GUILayout {
-	private HashMap<Integer, Integer> rowDefaults;
-	private HashMap<Integer, Integer> columnDefaults;
+	public static class TableMap extends HashMap<Integer, Container<Dimension>> {
+		public Dimension get(int i) {
+			return super.get(i).get();
+		}
+		
+		public int getValue(int i) {
+			return super.get(i).get().get();
+		}
+		
+		public int getValueOrDefault(int i, int d) {
+			try {
+				return getValue(i);
+			} catch (Exception e) {
+				return d;
+			}
+		}
+		
+		public Container<Dimension> getContainer(int i) {
+			return super.get(i);
+		}
+		
+		public void put(int i, Dimension d) {
+			Container<Dimension> dim = super.get(i);
+			if (dim == null) {
+				dim = new Container<Dimension>();
+				super.put(i, dim);
+			}
+			
+			dim.set(d);
+		}
+	}
+	
+	private TableMap rowDefaults;
+	private TableMap columnDefaults;
+	
+	private TableMap columnSizes;
+	private TableMap rowSizes;
 	
 	private int totalWidth;
 	private int totalHeight;
 	
 	public GUILayoutGrid() {
-		rowDefaults = new HashMap<Integer, Integer>();
-		columnDefaults = new HashMap<Integer, Integer>();
+		rowDefaults = new TableMap();
+		columnDefaults = new TableMap();
 	}
  
 	@Override
@@ -31,52 +67,62 @@ public class GUILayoutGrid extends GUILayout {
 
 	@Override
 	public void update() {
-		HashMap<Integer, Integer> columnSizes = new HashMap<Integer, Integer>();
-		HashMap<Integer, Integer> rowSizes = new HashMap<Integer, Integer>();
+		columnSizes = new TableMap();
+		rowSizes = new TableMap();
 				
 		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
-			int width = settings.getAdditionalWidth() + component.getPaddedWidth();
-			int height = settings.getAdditionalHeight() + component.getPaddedHeight();			
 			
-			if (columnSizes.getOrDefault(settings.column, 0) < width)
-				columnSizes.put(settings.column, width);
+			DimensionMeasurement width = component.getDimensionMeasurementByDim(Dim.X);
+			DimensionMeasurement height = component.getDimensionMeasurementByDim(Dim.Y);
 			
-			if (rowSizes.getOrDefault(settings.row, 0) < height)
-				rowSizes.put(settings.row, height);
+			setMaxInDimension(columnSizes, settings.column, 
+					width.add(settings.getAdditionalWidth() + component.getPaddedWidth()));
+			setMaxInDimension(rowSizes, settings.row, 
+					height.add(settings.getAdditionalHeight() + component.getPaddedHeight()));
+			
+			width.setParent(columnSizes.getContainer(settings.column));
+			height.setParent(rowSizes.getContainer(settings.row));
 		}
 		
 		applyDefaults(rowSizes, columnSizes);
-		placeComponents(rowSizes, columnSizes);
-		totalSizes(rowSizes, columnSizes);
 	}
 	
-	private void totalSizes(HashMap<Integer, Integer> rowSizes, HashMap<Integer, Integer> columnSizes) {
+	@Override
+	public void place() {
+		placeComponents();
+		totalSizes();
+	}
+	
+	private void totalSizes() {
 		totalWidth = 0;
 		totalHeight = 0;
 		
-		for (int i : columnSizes.values())
-			totalWidth += i;
-		for (int i : rowSizes.values()) 
-			totalHeight += i;
+		for (int i : columnSizes.keySet())
+			totalWidth += columnSizes.get(i).get();
+		for (int i : rowSizes.keySet()) 
+			totalHeight += rowSizes.get(i).get();
 	}
 		
-	private void placeComponents(HashMap<Integer, Integer> rowSizes, HashMap<Integer, Integer> columnSizes) {
+	private void placeComponents() {
+		totalWidth = 0;
+		totalHeight = 0;
+		
 		for (GUIComponent component : getComponents()) {
 			GUILayoutSettingsGrid settings = (GUILayoutSettingsGrid) component.getLayoutSettings();
 			int offset = 0;
 			for (int i = settings.column - 1; i >= 0; i--) {
-				offset += columnSizes.getOrDefault(i, 0);
+				offset += columnSizes.getValueOrDefault(i, 0);
 			}
-			component.x = decideCoord(offset, columnSizes.get(settings.column), component.getPaddedWidth(), 
+			component.x = decideCoord(offset, columnSizes.getValue(settings.column), component.getPaddedWidth(), 
 					settings.marginLeft, settings.marginRight, settings.floatX);
 			// component.x += settings.marginLeft;
 			
 			offset = 0;
 			for (int i = settings.row - 1; i >= 0; i--) {
-				offset += rowSizes.getOrDefault(i, 0);
+				offset += rowSizes.getValueOrDefault(i, 0);
 			}
-			component.y = decideCoord(offset, rowSizes.get(settings.row), component.getPaddedHeight(), 
+			component.y = decideCoord(offset, rowSizes.getValue(settings.row), component.getPaddedHeight(), 
 					settings.marginTop, settings.marginBottom, settings.floatY);
 		}
 	}
@@ -92,31 +138,21 @@ public class GUILayoutGrid extends GUILayout {
 		}
 	}
 	
-	private void applyDefaults(HashMap<Integer, Integer> rowSizes, HashMap<Integer, Integer> columnSizes) {
-		for (Entry<Integer, Integer> data : columnDefaults.entrySet()) {
-			columnSizes.put(data.getKey(), data.getValue());
+	private void applyDefaults(TableMap rowSizes, TableMap columnSizes) {
+		for (Entry<Integer, Container<Dimension>> data : columnDefaults.entrySet()) {
+			columnSizes.put(data.getKey(), data.getValue().get());
 		}
 		
-		for (Entry<Integer, Integer> data : rowDefaults.entrySet()) {
-			rowSizes.put(data.getKey(), data.getValue());
+		for (Entry<Integer, Container<Dimension>> data : rowDefaults.entrySet()) {
+			rowSizes.put(data.getKey(), data.getValue().get());
 		}
 	}
-
-	@Override
-	public int getComponentAlottedDimension(GUIComponent component, Dim d) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getComponentAlottedWidth(GUIComponent component) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getComponentAlottedHeight(GUIComponent component) {
-		// TODO Auto-generated method stub
-		return 0;
+	
+	private void setMaxInDimension(TableMap map, int i, Dimension d) {
+		if (map.get(i) == null) {
+			map.put(i, d);
+		} else {
+			map.put(i, Dimension.max(d, map.get(i)));
+		}
 	}
 }

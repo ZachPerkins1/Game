@@ -34,14 +34,4 @@ public class GUILayoutAbsolute extends GUILayout {
 	public int getBoundingHeight() {
 		return maxHeight;
 	}
-
-	@Override
-	public int getComponentAlottedWidth(GUIComponent component) {
-		return 0;
-	}
-
-	@Override
-	public int getComponentAlottedHeight(GUIComponent component) {
-		return 0;
-	}
 }
