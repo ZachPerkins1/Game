@@ -28,7 +28,7 @@ public class Chunk extends SortedPoint2D {
 		this.y = y;
 		this.backdrop = 0;
 		this.world = world;
-		blocks = new Block[2][SIZE][SIZE];
+		blocks = new Block[LAYERS][SIZE][SIZE];
 		fill();
 		
 		blockEntities = new BlockEntity[SIZE][SIZE];

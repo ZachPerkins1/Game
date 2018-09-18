@@ -64,6 +64,5 @@ public class GUILabel extends GUIComponent {
 	public void update() {
 		this.getWidthMeasurement().setAuto(width);
 		this.getHeightMeasurement().setAuto(font.getHeight());
-		System.out.println(this.getWidthMeasurement());
 	}
 }

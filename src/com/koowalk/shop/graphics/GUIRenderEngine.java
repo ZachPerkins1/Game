@@ -66,6 +66,14 @@ public class GUIRenderEngine {
 		}
 	}
 	
+	public void loadVAO(int vao, GUIComponent component) {
+		if (vaos.containsKey(component.getUID())) {
+			vao = vaos.get(component.getUID());
+		} else {
+			vao = createVAO(component);
+		}
+	}
+	
 	private void drawImage(GUIImage image) {
 		programs[0].use();
 		image.getImage().use(0, programs[0], "tex");

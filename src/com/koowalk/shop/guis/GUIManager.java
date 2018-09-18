@@ -14,7 +14,7 @@ public class GUIManager {
 	private GUIFrame master;
 	
 	public GUIManager() {
-		master = new GUIFrame(new GUILayoutAbsolute(), Color.BLUE);
+		master = new GUIFrame(new GUILayoutGrid(), Color.BLUE);
 		renderEngine = new GUIRenderEngine();
 	}
 	
