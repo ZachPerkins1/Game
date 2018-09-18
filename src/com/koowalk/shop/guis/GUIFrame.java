@@ -29,6 +29,7 @@ public class GUIFrame extends GUIComponent {
 		super(GUITypeIdentifier.TYPE_FRAME);
 		this.color = color;
 		children = new ArrayList<GUIComponent>();
+		manager.setParentBounds(getWidthMeasurement(), getHeightMeasurement());
 		layoutManager = manager;
 	}
 	
@@ -43,6 +44,10 @@ public class GUIFrame extends GUIComponent {
 	
 	public void setLayoutManager(GUILayout manager) {
 		layoutManager = manager;
+	}
+	
+	public GUILayout getLayoutManager() {
+		return layoutManager;
 	}
 	
 	public void update() {

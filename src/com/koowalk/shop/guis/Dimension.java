@@ -15,6 +15,10 @@ public abstract class Dimension {
 		return new DimensionAdder(a, b);
 	}
 	
+	public static DimensionSubtractor subtract(Dimension a, Dimension b) {
+		return new DimensionSubtractor(a, b);
+	}
+	
 	public static DimensionMax max(Dimension a, Dimension b) {
 		return new DimensionMax(a, b);
 	}

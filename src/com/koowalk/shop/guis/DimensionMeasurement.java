@@ -27,10 +27,12 @@ public class DimensionMeasurement extends Dimension {
 	}
 	
 	public void setAbsolute(int absolute) {
+		mode = Mode.ABSOLUTE;
 		this.absolute = absolute;
 	}
 	
 	public void setRelative(double relative) {
+		mode = Mode.RELATIVE;
 		this.relative = relative;
 	}
 	
@@ -38,6 +40,10 @@ public class DimensionMeasurement extends Dimension {
 		if (mode == Mode.AUTO) {
 			this.absolute = measurement;
 		}
+	}
+	
+	public void setMode(Mode mode) {
+		this.mode = mode;
 	}
 	
 	public Mode getMode() {

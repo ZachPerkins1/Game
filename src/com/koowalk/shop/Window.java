@@ -8,12 +8,15 @@ import com.koowalk.shop.graphics.FontLoader;
 import com.koowalk.shop.graphics.GLTexture;
 import com.koowalk.shop.graphics.GLTextureArray;
 import com.koowalk.shop.graphics.TextureRegistry;
+import com.koowalk.shop.guis.DimensionMeasurement;
+import com.koowalk.shop.guis.DimensionMeasurement.Mode;
 import com.koowalk.shop.guis.GUIFrame;
 import com.koowalk.shop.guis.GUIImage;
 import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUILayoutSettingsAbsolute;
 import com.koowalk.shop.guis.GUILayoutSettingsGrid;
 import com.koowalk.shop.guis.GUIManager;
+import com.koowalk.shop.guis.GUILayoutGrid;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -143,15 +146,21 @@ public class Window {
 		ChunkRenderEngine.create();
 		GUIImage img = new GUIImage(1);
 		
+		GUIManager.getInstance().getMaster().getWidthMeasurement().setAbsolute(300);
+		DimensionMeasurement m = new DimensionMeasurement(Mode.RELATIVE);
+		m.setRelative(1.0);
+		((GUILayoutGrid)GUIManager.getInstance().getMaster().getLayoutManager()).setColumnSize(1, m);
+		
 		GUIFrame frame = new GUIFrame(Color.RED);
 		frame.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(0,0,0,0,0,0,Sticky.POSITIVE, Sticky.POSITIVE));
 		frame.setPadding(10);
 		
 		GUIFrame frame2 = new GUIFrame(Color.BLACK);
 		frame2.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,0,0,0,0,0, Sticky.NEGATIVE, Sticky.NEUTRAL));
-//		
-//		GUIFrame frame3 = new GUIFrame(Color.GREEN);
-//		frame3.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,1,0,0,0,0, Sticky.NEUTRAL, Sticky.NEUTRAL));
+		
+		GUIFrame frame3 = new GUIFrame(Color.GREEN);
+		frame3.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,1,0,0,0,0, Sticky.NEUTRAL, Sticky.NEUTRAL));
+		frame3.getHeightMeasurement().setRelative(1.0);
 		
 		// frame.setPadding(20);
 		// img.setParent(GUIManager.getInstance().getMaster(), attr);
@@ -170,9 +179,9 @@ public class Window {
 			frame2.setPadding(20);
 			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "Hello");
 			label2.setParent(frame2, new GUILayoutSettingsAbsolute(0,0));
-//			
-//			GUILabel label3 = new GUILabel("OpenSans-Regular", 30, "Goodbye");
-//			label3.setParent(frame3, new GUILayoutSettingsAbsolute(0,0));
+			
+			GUILabel label3 = new GUILabel("OpenSans-Regular", 30, "Goodbye");
+			label3.setParent(frame3, new GUILayoutSettingsAbsolute(0,0));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
