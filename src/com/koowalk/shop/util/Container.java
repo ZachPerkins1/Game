@@ -18,4 +18,8 @@ public class Container<T> {
 	public T get() {
 		return item;
 	}
+	
+	public String toString() {
+		return item.toString();
+	}
 }

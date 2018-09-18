@@ -143,12 +143,12 @@ public class Window {
 		ChunkRenderEngine.create();
 		GUIImage img = new GUIImage(1);
 		
-//		GUIFrame frame = new GUIFrame(Color.RED);
-//		frame.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(0,0,0,0,0,0,Sticky.POSITIVE, Sticky.POSITIVE));
-//		frame.setPadding(10);
-//		
-//		GUIFrame frame2 = new GUIFrame(Color.BLACK);
-//		frame2.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,0,0,0,5,0, Sticky.NEUTRAL, Sticky.POSITIVE));
+		GUIFrame frame = new GUIFrame(Color.RED);
+		frame.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(0,0,0,0,0,0,Sticky.POSITIVE, Sticky.POSITIVE));
+		frame.setPadding(10);
+		
+		GUIFrame frame2 = new GUIFrame(Color.BLACK);
+		frame2.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,0,0,0,0,0, Sticky.NEGATIVE, Sticky.NEUTRAL));
 //		
 //		GUIFrame frame3 = new GUIFrame(Color.GREEN);
 //		frame3.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,1,0,0,0,0, Sticky.NEUTRAL, Sticky.NEUTRAL));
@@ -165,11 +165,11 @@ public class Window {
 		
 		try {
 			GUILabel label = new GUILabel("OpenSans-Regular", 60, "Test");
-			label.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsAbsolute(30, 0));
+			label.setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
 			
-//			frame2.setPadding(20);
-//			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "Hello");
-//			label2.setParent(frame2, new GUILayoutSettingsAbsolute(0,0));
+			frame2.setPadding(20);
+			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "Hello");
+			label2.setParent(frame2, new GUILayoutSettingsAbsolute(0,0));
 //			
 //			GUILabel label3 = new GUILabel("OpenSans-Regular", 30, "Goodbye");
 //			label3.setParent(frame3, new GUILayoutSettingsAbsolute(0,0));

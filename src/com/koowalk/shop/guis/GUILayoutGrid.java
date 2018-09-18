@@ -58,12 +58,12 @@ public class GUILayoutGrid extends GUILayout {
  
 	@Override
 	public int getBoundingWidth() {
-		return totalSize(rowSizes);
+		return totalSize(columnSizes);
 	}
 
 	@Override
 	public int getBoundingHeight() {
-		return totalSize(columnSizes);
+		return totalSize(rowSizes);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class GUILayoutGrid extends GUILayout {
 			width.setParent(columnSizes.getContainer(settings.column));
 			height.setParent(rowSizes.getContainer(settings.row));
 		}
-		
+				
 		applyDefaults(rowSizes, columnSizes);
 	}
 	
@@ -98,7 +98,7 @@ public class GUILayoutGrid extends GUILayout {
 		int totalSize = 0;
 		
 		for (int i : table.keySet())
-			totalSize += columnSizes.getValueOrDefault(i, 0);
+			totalSize += table.getValueOrDefault(i, 0);
 		
 		return totalSize;
 	}
