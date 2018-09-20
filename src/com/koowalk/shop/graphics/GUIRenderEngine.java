@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
 
+import com.koowalk.shop.graphics.Font.Alignment;
 import com.koowalk.shop.guis.GUIComponent;
 import com.koowalk.shop.guis.GUIFrame;
 import com.koowalk.shop.guis.GUIImage;
@@ -167,6 +168,6 @@ public class GUIRenderEngine {
 	}
 	
 	private void loadLabelVAO(GUILabel label) {
-		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), label.getPaddedX(), label.getPaddedY(), label.getText());
+		label.getFont().fillBuffers(glGenBuffers(), glGenBuffers(), label.getPaddedX(), label.getPaddedY(), label.getRenderTarget(), Alignment.LEFT);
 	}
 }

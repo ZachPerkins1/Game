@@ -10,8 +10,10 @@ public class GUILabel extends GUIComponent {
 	private Font font;
 	private String text;
 	private Color color;
+	private Font.FontRenderTarget renderTarget;
 	
 	private int width;
+	private int height;
 	
 	public GUILabel(Font font, String text, Color color) {
 		super(GUITypeIdentifier.TYPE_LABEL);
@@ -52,8 +54,14 @@ public class GUILabel extends GUIComponent {
 		return getText();
 	}
 	
+	public Font.FontRenderTarget getRenderTarget() {
+		return renderTarget;
+	}
+	
 	public void setText(String text) {
-		width = font.getWidth(text);
+		renderTarget = font.getRenderTarget(text, 75, 5);
+		width = renderTarget.getBoundingWidth();
+		height = renderTarget.getBoundingHeight();
 		this.text = text;
 	}
 	
@@ -63,6 +71,6 @@ public class GUILabel extends GUIComponent {
 	
 	public void update() {
 		this.getWidthMeasurement().setAuto(width);
-		this.getHeightMeasurement().setAuto(font.getHeight());
+		this.getHeightMeasurement().setAuto(height);
 	}
 }

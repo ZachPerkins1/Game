@@ -177,7 +177,7 @@ public class Window {
 			label.setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
 			
 			frame2.setPadding(20);
-			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "Hello");
+			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "This would be some form of in-game description");
 			label2.setParent(frame2, new GUILayoutSettingsAbsolute(0,0));
 			
 			GUILabel label3 = new GUILabel("OpenSans-Regular", 30, "Goodbye");
