@@ -1,6 +1,6 @@
 #version 450
 
-#include "base.glsl"
+#include "vertex_constants.glsl"
 
 layout(location = 0) in vec2 pos;
 uniform vec2 offset = vec2(0, 0);
