@@ -78,6 +78,18 @@ public class GUIRenderEngine {
 			this.program.use();
 		}
 		
+		public void fillProgramDefaults(GUIComponent component) {
+			program.setUniform2Vec("min", new float[] {
+					(float) component.getMaxBounds().getMinX(),
+					(float) component.getMaxBounds().getMinY()
+			});
+			
+			program.setUniform2Vec("max", new float[] {
+					(float) component.getMaxBounds().getMaxX(),
+					(float) component.getMaxBounds().getMaxY()
+			});
+		}
+		
 		private void loadProgram(String program) {
 			try {
 				this.program.loadShader(SHADER_DIRECTORY + program + "_vertex.glsl", GL_VERTEX_SHADER);
@@ -224,6 +236,7 @@ public class GUIRenderEngine {
 		RenderMode mode = renderModes[component.getType().getIndex()];
 		mode.bindRenderData(component);
 		mode.useProgram();
+		mode.fillProgramDefaults(component);
 		if (component.hasBeenUpdated()) {
 			Logger.info("Updating buffers");
 			mode.fillBuffers(component);

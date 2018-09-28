@@ -22,4 +22,8 @@ public enum GUITypeIdentifier {
 	public String getTag() {
 		return tag;
 	}
+	
+	public String toString() {
+		return tag;
+	}
 }

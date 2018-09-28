@@ -1,5 +1,8 @@
 package com.koowalk.shop.guis;
 
+import java.awt.Rectangle;
+
+import com.koowalk.shop.Window;
 import com.koowalk.shop.util.Dim;
 
 public abstract class GUIComponent {
@@ -199,6 +202,18 @@ public abstract class GUIComponent {
 		boolean old = updated;
 		updated = false;
 		return old;
+	}
+	
+	public Rectangle getMaxBounds() {
+		if (parent != null) {
+			int width = parent.getWidthMeasurement().get();
+			int height = parent.getHeightMeasurement().get();
+			int x = parent.getPaddedX();
+			int y = parent.getPaddedY();
+			return new Rectangle(x, y, width, height);
+		}
+		
+		return new Rectangle(0, 0, Window.WIDTH, Window.HEIGHT);
 	}
 	
 	public void update() {};
