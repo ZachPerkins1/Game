@@ -100,8 +100,10 @@ public class GUIRenderEngine {
 				float[] colorComponents = new float[4];
 				color.getComponents(colorComponents);
 				getProgram().setUniform4Vec("color", colorComponents);
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			}
+			
+			getProgram().setUniform2Vec("offset", new float[] {frame.getX(), frame.getY()});
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
 		@Override
@@ -109,10 +111,10 @@ public class GUIRenderEngine {
 			GUIFrame frame = (GUIFrame)component;
 			
 			float[] data = new float[] 
-						   {frame.getX(),                          frame.getY(),                     
-							frame.getX() + frame.getPaddedWidth(), frame.getY(),                    
-							frame.getX() + frame.getPaddedWidth(), frame.getY() + frame.getPaddedHeight(),
-							frame.getX()                         , frame.getY() + frame.getPaddedHeight()};
+						   {0,                      0,                     
+							frame.getPaddedWidth(), 0,                    
+							frame.getPaddedWidth(), frame.getPaddedHeight(),
+							0,                      frame.getPaddedHeight()};
 			
 			int[] indices = new int[] {3, 1, 0, 3, 2, 1};
 					
@@ -137,6 +139,7 @@ public class GUIRenderEngine {
 			GUIImage image = (GUIImage) component;
 			
 			image.getImage().use(0, getProgram(), "tex");
+			getProgram().setUniform2Vec("offset", new float[] {image.getPaddedX(), image.getPaddedY()});
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
@@ -145,10 +148,10 @@ public class GUIRenderEngine {
 			GUIImage image = (GUIImage)component;
 			
 			float[] data = new float[] 
-						   {image.getPaddedX(),                     image.getPaddedY(),                      0, 1,
-							image.getPaddedX() + image.getWidth(), image.getPaddedY(),                      1, 1,
-							image.getPaddedX() + image.getWidth(), image.getPaddedY() + image.getHeight(), 1, 0,
-							image.getPaddedX()                    , image.getPaddedY() + image.getHeight(), 0, 0};
+						   {0,                0,                 0, 1,
+							image.getWidth(), 0,                 1, 1,
+							image.getWidth(), image.getHeight(), 1, 0,
+							0,                image.getHeight(), 0, 0};
 			
 			int[] indices = new int[] {3, 1, 0, 3, 2, 1};
 					
@@ -184,13 +187,14 @@ public class GUIRenderEngine {
 			
 			// Use the font sheet for rendering
 			label.getFont().useTexture(getProgram(), "tex");
+			getProgram().setUniform2Vec("offset", new float[] {label.getPaddedX(), label.getPaddedY()});
 			glDrawElements(GL_TRIANGLES, label.getVertexCount(), GL_UNSIGNED_INT, 0);
 		}
 
 		@Override
 		public void fillBuffers(GUIComponent component) {
 			GUILabel label = (GUILabel) component;
-			label.getFont().fillBuffers(label.getPaddedX(), label.getPaddedY(), label.getRenderTarget(), Alignment.LEFT);
+			label.getFont().fillBuffers(0, 0, label.getRenderTarget(), Alignment.LEFT);
 		}
 
 		@Override
