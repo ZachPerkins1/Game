@@ -55,7 +55,7 @@ public class GUIRenderEngine {
 		
 		public void bindRenderData(GUIComponent component) {
 			if (!dataMap.containsKey(component.getUID())) {
-				dataMap.put(component.getUID(), new RenderData(glGenVertexArrays(), glGenBuffers(), glGenBuffers()));
+				dataMap.put(component.getUID(), new RenderData(glGenBuffers(), glGenBuffers(), glGenVertexArrays()));
 			}
 			
 			RenderData item = dataMap.get(component.getUID());
@@ -200,74 +200,30 @@ public class GUIRenderEngine {
 		
 	}
 	
-	private GLProgram[] programs;
+	private RenderMode[] renderModes;
 	
 	HashMap<Long, Integer> vaos;
 	
 	public GUIRenderEngine() {
 		vaos = new HashMap<Long, Integer>();
-		createPrograms();
-	}
-	
-	private void createPrograms() {
-		Logger.info("Loading GUI shader programs");
-		try {
-			programs = new GLProgram[GUITypeIdentifier.TYPE_COUNT];
-			for (int i = 0; i < programs.length; i++) {
-				programs[i] = new GLProgram();
-				programs[i].loadShader(SHADER_DIRECTORY + SHADER_NAMES[i] + "_vertex.glsl", GL_VERTEX_SHADER);
-				programs[i].loadShader(SHADER_DIRECTORY + SHADER_NAMES[i] + "_fragment.glsl", GL_FRAGMENT_SHADER);
-				programs[i].link();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		renderModes = new RenderMode[GUITypeIdentifier.TYPE_COUNT];
+		Logger.info("Loading GUI render modes...");
+		Logger.info("- Frame");
+		renderModes[GUITypeIdentifier.TYPE_FRAME.getIndex()] = new FrameRenderMode();
+		Logger.info("- Image");
+		renderModes[GUITypeIdentifier.TYPE_IMAGE.getIndex()] = new ImageRenderMode();
+		Logger.info("- Label");
+		renderModes[GUITypeIdentifier.TYPE_LABEL.getIndex()] = new LabelRenderMode();
 	}
 	
 	public void drawComponent(GUIComponent component) {
-		int vao;
-		
-		if (vaos.containsKey(component.getUID())) {
-			vao = vaos.get(component.getUID());
-		} else {
-			vao = createVAO(component);
+		RenderMode mode = renderModes[component.getType().getIndex()];
+		mode.bindRenderData(component);
+		mode.useProgram();
+		if (component.hasBeenUpdated()) {
+			Logger.info("Updating buffers");
+			mode.fillBuffers(component);
 		}
-
-		
-		glBindVertexArray(vao);
-		programs[component.getType().getIndex()].use();
-		
-		if (component.getType() == GUITypeIdentifier.TYPE_IMAGE) {
-			drawImage((GUIImage)component);
-		} else if (component.getType() == GUITypeIdentifier.TYPE_LABEL) {
-			drawLabel((GUILabel)component);
-		} else if (component.getType() == GUITypeIdentifier.TYPE_FRAME) {
-			drawFrame((GUIFrame)component);
-		}
-	}
-	
-	public void loadVAO(int vao, GUIComponent component) {
-		if (vaos.containsKey(component.getUID())) {
-			vao = vaos.get(component.getUID());
-		} else {
-			vao = createVAO(component);
-		}
-	}
-	
-	private int createVAO(GUIComponent component) {
-		Logger.info("Loading VAO for component with UID " + component.getUID());
-		int vao = glGenVertexArrays();
-		glBindVertexArray(vao);
-		
-		if (component.getType() == GUITypeIdentifier.TYPE_IMAGE) {
-			loadImageVAO((GUIImage) component);
-		} else if (component.getType() == GUITypeIdentifier.TYPE_LABEL) {
-			loadLabelVAO((GUILabel)component);
-		} else if (component.getType() == GUITypeIdentifier.TYPE_FRAME) {
-			loadFrameVAO((GUIFrame)component);
-		}
-		
-		vaos.put(component.getUID(), vao);
-		return vao;
+		mode.draw(component);
 	}
 }
