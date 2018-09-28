@@ -18,16 +18,8 @@ public class GLProgram {
 	
 	public void loadShader(String filename, int type) throws IOException {
 		int id = glCreateShader(type);
-		BufferedReader reader;
-		reader = new BufferedReader(new FileReader(filename));
-		String file = "";
-		String line;
-		
-		while ((line = reader.readLine()) != null) {
-			file += line + "\n";
-		}
-		
-		reader.close();
+		GLShaderParser parser = new GLShaderParser(filename);
+		String file = parser.parse();
 		
 		glShaderSource(id, file);
 		glCompileShader(id);

@@ -1,22 +1,9 @@
 #version 450
 
+#include "base.glsl"
+
 layout(location = 0) in vec2 pos;
 uniform vec2 offset = vec2(0, 0);
-
-mat4 projection = mat4(
-			0.0025, 0, 0, 0,
-			0, -0.0025, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		);
-
-mat4 transform = mat4(
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		-1, 1, 0, 1
-);
-
 
 void main() {
 	gl_Position = transform * projection * vec4(pos + offset, 0, 1);
