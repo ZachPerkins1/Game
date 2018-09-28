@@ -5,11 +5,13 @@ import java.io.IOException;
 
 import com.koowalk.shop.graphics.Font;
 import com.koowalk.shop.graphics.FontLoader;
+import com.koowalk.shop.guis.DimensionMeasurement.Mode;
 
 public class GUILabel extends GUIComponent {
 	private Font font;
 	private String text;
 	private Color color;
+	private	int lineSpacing;
 	private Font.FontRenderTarget renderTarget;
 	
 	private int width;
@@ -59,18 +61,38 @@ public class GUILabel extends GUIComponent {
 	}
 	
 	public void setText(String text) {
-		renderTarget = font.getRenderTarget(text, 75, 5);
-		width = renderTarget.getBoundingWidth();
-		height = renderTarget.getBoundingHeight();
 		this.text = text;
+		recalculateRenderTarget();
 	}
 	
 	public int getVertexCount() {
 		return text.length() * 6;
 	}
 	
+	@Override
 	public void update() {
 		this.getWidthMeasurement().setAuto(width);
 		this.getHeightMeasurement().setAuto(height);
+	}
+	
+	@Override
+	public void place() {
+		if (getWidthMeasurement().get() != width) {
+			recalculateRenderTarget();
+		}
+		
+		this.getHeightMeasurement().setAuto(height);
+	}
+	
+	private void recalculateRenderTarget() {
+		updated	= true;
+		int wrapWidth = -1;
+		if (getWidthMeasurement().getMode() != Mode.AUTO) {
+			wrapWidth = getWidthMeasurement().get();
+		}
+		
+		renderTarget = font.getRenderTarget(text, wrapWidth, lineSpacing);
+		width = renderTarget.getBoundingWidth();
+		height = renderTarget.getBoundingHeight();
 	}
 }

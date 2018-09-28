@@ -22,6 +22,8 @@ public abstract class GUIComponent {
 	private DimensionMeasurement width;
 	private DimensionMeasurement height;
 	
+	protected boolean updated;
+	
 	public GUIComponent(GUITypeIdentifier type) {
 		width = new DimensionMeasurement();
 		height = new DimensionMeasurement();
@@ -125,6 +127,7 @@ public abstract class GUIComponent {
 	}
 	
 	public void setPadding(int top, int bottom, int left, int right) {
+		updated = top != pTop || bottom != pBottom || left != pLeft || right != pRight;
 		pTop = top;
 		pBottom = bottom;
 		pLeft = left;
@@ -136,29 +139,27 @@ public abstract class GUIComponent {
 	}
 	
 	public void setPaddingY(int top, int bottom) {
-		pTop = top;
-		pBottom = bottom;
+		setPadding(top, bottom, pLeft, pRight);
 	}
 	
 	public void setPaddingX(int left, int right) {
-		pLeft = left;
-		pRight = right;
+		setPadding(pTop, pBottom, left, right);
 	}
 	
 	public void setPaddingTop(int top) {
-		pTop = top;
+		setPadding(top, pBottom, pLeft, pRight);
 	}
 	
 	public void setPaddingBottom(int bottom) {
-		pBottom = bottom;
+		setPadding(pTop, bottom, pLeft, pRight);
 	}
 	
 	public void setPaddingLeft(int left) {
-		pLeft = left;
+		setPadding(pTop, pBottom, left, pRight);
 	}
 	
 	public void setPaddingRight(int right) {
-		pRight = right;
+		setPadding(pTop, pBottom, pLeft, right);
 	}
 	
 	public GUITypeIdentifier getType() {
@@ -188,6 +189,16 @@ public abstract class GUIComponent {
 	
 	public long getUID() {
 		return uid;
+	}
+	
+	public boolean hasBeenUpdated() {
+		return this.popUpdate() || width.popUpdate() || height.popUpdate();
+	}
+	
+	public boolean popUpdate() {
+		boolean old = updated;
+		updated = false;
+		return old;
 	}
 	
 	public void update() {};

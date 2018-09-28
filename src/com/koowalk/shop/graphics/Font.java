@@ -2,20 +2,12 @@ package com.koowalk.shop.graphics;
 import static org.lwjgl.stb.STBTruetype.*;
 import org.lwjgl.stb.STBTTAlignedQuad;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.IntStream;
-
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
-
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTTFontinfo;
 
@@ -113,18 +105,12 @@ public class Font {
 	/**
 	 * Given id references to an openGL array buffer pointer and an element array buffer pointer, bind
 	 * them and fill them with correct position and texture coordinate for a given FontRenderTarget.
-	 * @param arrayBuffer The OpenGL array buffer handle
-	 * @param elementArrayBuffer The OpenGL element array buffer handle
 	 * @param inX The upper left X position of the text to be rendered
 	 * @param inY The upper left Y position of the text to be rendered
 	 * @param target The text to render in the form of the font render target see: {@link Font#getRenderTarget(String, int, int)}
 	 * @param align The alignment of the text (i.e. left, right, center)
 	 */
-	public void fillBuffers(int arrayBuffer, int elementArrayBuffer, int inX, int inY, 
-			FontRenderTarget target, Alignment align) {
-		glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer);
-		
+	public void fillBuffers(int inX, int inY, FontRenderTarget target, Alignment align) {
 		StringLine[] lines = target.lines;
 		int maxWidth = target.maxWidth;
 		int count = target.charCount;

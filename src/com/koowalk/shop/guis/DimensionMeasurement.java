@@ -15,6 +15,8 @@ public class DimensionMeasurement extends Dimension {
 	private int absolute;
 	private double relative;
 	
+	private boolean updated;
+	
 	public DimensionMeasurement(Mode m) {
 		mode = m;
 		absolute = 0;
@@ -27,6 +29,7 @@ public class DimensionMeasurement extends Dimension {
 	}
 	
 	public void setAbsolute(int absolute) {
+		this.updated = this.absolute != absolute;
 		mode = Mode.ABSOLUTE;
 		this.absolute = absolute;
 	}
@@ -38,6 +41,7 @@ public class DimensionMeasurement extends Dimension {
 	
 	public void setAuto(int measurement) {
 		if (mode == Mode.AUTO) {
+			updated = this.absolute != measurement;
 			this.absolute = measurement;
 		}
 	}
@@ -54,10 +58,20 @@ public class DimensionMeasurement extends Dimension {
 		this.parent = parent;
 	}
 	
+	public boolean popUpdate() {
+		boolean tmp = updated;
+		updated = false;
+		return tmp;
+	}
+	
 	public int get() {
 		if (mode == Mode.RELATIVE) {
 			try {
-				return (int)(parent.get().get()*relative);
+				int parentValue = (int)(parent.get().get()*relative);
+				if (parentValue != absolute) {
+					updated = true;
+					absolute = parentValue;
+				}
 			} catch (Exception e) {
 				return 0;
 			}
