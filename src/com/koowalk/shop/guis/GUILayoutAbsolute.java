@@ -7,10 +7,7 @@ import com.koowalk.shop.util.Dim;
 public class GUILayoutAbsolute extends GUILayout {
 	private int maxWidth = 0;
 	private int maxHeight = 0;
-	
-	private boolean autoWidth = true;
-	private boolean autoHeight = true;
-	
+		
 	private boolean dimensionUpdateRequired = true;
 	
 	@Override
@@ -52,13 +49,5 @@ public class GUILayoutAbsolute extends GUILayout {
 	
 			dimensionUpdateRequired = false;
 		}
-	}
-	
-	public void setWidth() {
-		
-	}
-	
-	public void setHeight() {
-		
 	}
 }
