@@ -8,8 +8,6 @@ import com.koowalk.shop.graphics.FontLoader;
 import com.koowalk.shop.graphics.GLTexture;
 import com.koowalk.shop.graphics.GLTextureArray;
 import com.koowalk.shop.graphics.TextureRegistry;
-import com.koowalk.shop.guis.DimensionMeasurement;
-import com.koowalk.shop.guis.DimensionMeasurement.Mode;
 import com.koowalk.shop.guis.GUIFrame;
 import com.koowalk.shop.guis.GUIImage;
 import com.koowalk.shop.guis.GUILabel;
@@ -32,6 +30,8 @@ import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import com.koowalk.shop.guis.GUILayoutSettingsGrid.Sticky;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement.Mode;
 import com.koowalk.shop.util.Logger;
 
 public class Window {
@@ -146,7 +146,7 @@ public class Window {
 		ChunkRenderEngine.create();
 		GUIImage img = new GUIImage(1);
 		
-		GUIManager.getInstance().getMaster().getWidthMeasurement().setAbsolute(300);
+		GUIManager.getInstance().getMaster().getWidthMeasurement().setAbsolute(500);
 		DimensionMeasurement m = new DimensionMeasurement(Mode.RELATIVE);
 		m.setRelative(1.0);
 		((GUILayoutGrid)GUIManager.getInstance().getMaster().getLayoutManager()).setColumnSize(1, m);
@@ -174,7 +174,10 @@ public class Window {
 		
 		try {
 			GUILabel label = new GUILabel("OpenSans-Regular", 60, "Test");
+			label.setColor(Color.BLACK);
 			label.setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
+			new GUILabel("OpenSans-Regular", 60, "Hello").setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
+			label.sendToTop();
 			
 			frame2.setPadding(20);
 			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "This would be some form of in-game description");

@@ -49,6 +49,17 @@ public class GUIManager {
 		master.place();
 	}
 	
+	public boolean processClick(int x, int y) {
+		GUIComponent clicked = master.processClick(x, y);
+		if (clicked != null) {
+			// Return the relative position of the click
+			clicked.onClick(x - clicked.getX(), y - clicked.getY());
+			return true;
+		} 
+		
+		return false;
+	}
+	
 	public static GUIManager getInstance() {
 		if (instance == null) 
 			instance = new GUIManager();

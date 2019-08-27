@@ -233,14 +233,22 @@ public class GUIRenderEngine {
 	}
 	
 	public void drawComponent(GUIComponent component) {
+		// Get the rendering mode for this component type
 		RenderMode mode = renderModes[component.getType().getIndex()];
+		// Bind all the vao that has been saved for this gui component	
 		mode.bindRenderData(component);
+		// Use the appropriate rendering program for this component
 		mode.useProgram();
+		// Add default settings into this program
 		mode.fillProgramDefaults(component);
+		
+		// If the component has been updated, refill the buffers to reflect the new size
 		if (component.hasBeenUpdated()) {
 			Logger.info("Updating buffers");
 			mode.fillBuffers(component);
 		}
+		
+		// Actually bind textures and draw the component
 		mode.draw(component);
 	}
 }

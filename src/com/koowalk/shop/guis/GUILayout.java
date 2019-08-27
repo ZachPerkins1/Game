@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.koowalk.shop.guis.dimension.DimensionMeasurement;
 import com.koowalk.shop.util.Dim;
 
 public abstract class GUILayout {

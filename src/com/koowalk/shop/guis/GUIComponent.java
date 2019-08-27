@@ -1,8 +1,11 @@
 package com.koowalk.shop.guis;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 
 import com.koowalk.shop.Window;
+import com.koowalk.shop.guis.dimension.Dimension;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement;
 import com.koowalk.shop.util.Dim;
 
 public abstract class GUIComponent {
@@ -20,6 +23,8 @@ public abstract class GUIComponent {
 	public int x;
 	public int y;
 	
+	protected int zindex;
+	
 	private GUITypeIdentifier type;
 	
 	private DimensionMeasurement width;
@@ -34,6 +39,8 @@ public abstract class GUIComponent {
 		uid = uidCounter;
 		uidCounter++;
 		this.type = type;
+		
+		zindex = 0;
 	}
 	
 	public int getPaddedWidth() {
@@ -341,6 +348,37 @@ public abstract class GUIComponent {
 		int y = getY();
 		return new Rectangle(x, y, width, height);
 	}
+	
+	public void setZIndex(int zindex) {
+		this.zindex = zindex;
+		parent.reorderChild(this);
+	}
+	
+	public int getZIndex() {
+		return zindex;
+	}
+	
+	public void sendToTop() {
+		if (parent != null) {
+			parent.sendToTop(this);
+		}
+	}
+	
+	public void sendToBottom() {
+		if (parent != null) {
+			parent.sendToBottom(this);
+		}
+	}
+	
+	public boolean intersectsClick(int x, int y) {
+		return getBounds().contains(new Point(x, y));
+	}
+	
+	public GUIComponent processClick(int x, int y) {
+		return this;
+	}
+	
+	public void onClick(int x, int y) {};
 	
 	/**
 	 * Decide the bounds of this GUIComponent and the members thereof (if it is a frame).

@@ -1,4 +1,4 @@
-package com.koowalk.shop.guis;
+package com.koowalk.shop.guis.dimension;
 
 public class DimensionMax extends DimensionComparator {
 

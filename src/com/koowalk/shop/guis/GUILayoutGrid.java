@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import com.koowalk.shop.guis.DimensionMeasurement.Mode;
 import com.koowalk.shop.guis.GUILayoutSettingsGrid.Sticky;
+import com.koowalk.shop.guis.dimension.Dimension;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement.Mode;
 import com.koowalk.shop.util.Container;
 import com.koowalk.shop.util.Dim;
 import com.koowalk.shop.util.Logger;

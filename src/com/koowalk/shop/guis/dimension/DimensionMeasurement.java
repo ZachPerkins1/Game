@@ -1,4 +1,4 @@
-package com.koowalk.shop.guis;
+package com.koowalk.shop.guis.dimension;
 
 import com.koowalk.shop.util.Container;
 

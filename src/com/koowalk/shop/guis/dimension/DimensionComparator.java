@@ -1,4 +1,4 @@
-package com.koowalk.shop.guis;
+package com.koowalk.shop.guis.dimension;
 
 public abstract class DimensionComparator extends Dimension {
 	private Dimension a;

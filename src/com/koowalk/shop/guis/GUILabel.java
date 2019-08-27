@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import com.koowalk.shop.graphics.Font;
 import com.koowalk.shop.graphics.FontLoader;
-import com.koowalk.shop.guis.DimensionMeasurement.Mode;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement.Mode;
 
 public class GUILabel extends GUIComponent {
 	private Font font;
@@ -63,6 +63,10 @@ public class GUILabel extends GUIComponent {
 	public void setText(String text) {
 		this.text = text;
 		recalculateRenderTarget();
+	}
+	
+	public void setColor(Color c) {
+		this.color = c;
 	}
 	
 	public int getVertexCount() {
