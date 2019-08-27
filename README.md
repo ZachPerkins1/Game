@@ -1,5 +1,5 @@
 # About
-This project is my work on an as-of-yet untitled shopkeeping game. Even though the concept is a little generic, my plans are to make the game a pretty expansive and accurate simulator of what running a shop would be like in an ever-fluctuating economy. Of course I'm only one developer who is also a full time student with a part time job so this might take a little while.
+This project is my work on a multipurpose 2D game engine, specifically for the use on a shopkeeping simulator game I want to make. The goal with this is to learn a lot about game development by building a lot of things from the ground up, and only using the minimum in terms of libraries.
 
 # What I'm using
 For this project I chose to use Java with the Lightweight java game library (lwjgl) which basically just provides Java bindings and memory management for OpenGL, GLFW, OpenAL and some other low-level C libraries. This has given me the chance to get experience working closely with the graphics pipeline as opposed to using a more abstracted library or engine.
@@ -23,4 +23,4 @@ Doing something like this is an ambitious project because, in order to get to th
 ## Future features
 - Create a method of audio effect loading and playing that is relative to the position of the character in the environment
 - Implement lighting in all of the shaders
-- Begin to implement core game features (this is pretty much the bulk of the remaining work but to list it would be extraneous)
+- (Actually build a game with it)
