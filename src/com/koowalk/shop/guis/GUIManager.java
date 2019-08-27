@@ -28,6 +28,7 @@ public class GUIManager {
 	
 	public void update() {
 		master.update();
+		master.place();
 	}
 	
 	private void render(GUIFrame frame) {
@@ -45,6 +46,18 @@ public class GUIManager {
 	
 	public void issueLayoutUpdates() {
 		master.update();
+		master.place();
+	}
+	
+	public boolean processClick(int x, int y) {
+		GUIComponent clicked = master.processClick(x, y);
+		if (clicked != null && !clicked.equals(master)) {
+			// Return the relative position of the click
+			clicked.onClick(x - clicked.getX(), y - clicked.getY());
+			return true;
+		} 
+		
+		return false;
 	}
 	
 	public static GUIManager getInstance() {

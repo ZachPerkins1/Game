@@ -1,9 +1,5 @@
 package com.koowalk.shop;
 import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-
 import com.koowalk.shop.pathfinding.InvalidPathException;
 import com.koowalk.shop.util.Logger;
 import com.koowalk.shop.world.Camera;

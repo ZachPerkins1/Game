@@ -14,6 +14,7 @@ import com.koowalk.shop.guis.GUILabel;
 import com.koowalk.shop.guis.GUILayoutSettingsAbsolute;
 import com.koowalk.shop.guis.GUILayoutSettingsGrid;
 import com.koowalk.shop.guis.GUIManager;
+import com.koowalk.shop.guis.GUILayoutGrid;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -29,6 +30,8 @@ import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import com.koowalk.shop.guis.GUILayoutSettingsGrid.Sticky;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement.Mode;
 import com.koowalk.shop.util.Logger;
 
 public class Window {
@@ -113,8 +116,10 @@ public class Window {
 			double[] y = new double[1];
  			glfwGetCursorPos(window, x, y);
  			
- 			if (action == GLFW_PRESS)
- 				game.mouseClicked(button, x[0], y[0]);
+ 			if (action == GLFW_PRESS) {
+ 				if (!GUIManager.getInstance().processClick((int)x[0], (int)y[0]))
+ 					game.mouseClicked(button, x[0], y[0]);
+ 			}
 		});
 
 		try ( MemoryStack stack = stackPush() ) {
@@ -143,15 +148,21 @@ public class Window {
 		ChunkRenderEngine.create();
 		GUIImage img = new GUIImage(1);
 		
+		GUIManager.getInstance().getMaster().getWidthMeasurement().setAbsolute(500);
+		DimensionMeasurement m = new DimensionMeasurement(Mode.RELATIVE);
+		m.setRelative(1.0);
+		((GUILayoutGrid)GUIManager.getInstance().getMaster().getLayoutManager()).setColumnSize(1, m);
+		
 		GUIFrame frame = new GUIFrame(Color.RED);
 		frame.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(0,0,0,0,0,0,Sticky.POSITIVE, Sticky.POSITIVE));
 		frame.setPadding(10);
 		
 		GUIFrame frame2 = new GUIFrame(Color.BLACK);
-		frame2.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,0,0,0,5,0, Sticky.NEUTRAL, Sticky.POSITIVE));
+		frame2.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,0,0,0,0,0, Sticky.NEGATIVE, Sticky.NEUTRAL));
 		
 		GUIFrame frame3 = new GUIFrame(Color.GREEN);
 		frame3.setParent(GUIManager.getInstance().getMaster(), new GUILayoutSettingsGrid(1,1,0,0,0,0, Sticky.NEUTRAL, Sticky.NEUTRAL));
+		frame3.getHeightMeasurement().setRelative(1.0);
 		
 		// frame.setPadding(20);
 		// img.setParent(GUIManager.getInstance().getMaster(), attr);
@@ -164,12 +175,16 @@ public class Window {
 		}
 		
 		try {
-			GUILabel label = new GUILabel("OpenSans-Regular", 60, "Test");
+			GUILabel label = new GUILabel("OpenSans-Regular", 100, "Test");
+			label.setColor(Color.BLACK);
 			label.setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
+			new GUILabel("OpenSans-Regular", 60, "Hello").setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
+			label.sendToTop();
 			
 			frame2.setPadding(20);
-			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "Hello");
+			GUILabel label2 = new GUILabel("OpenSans-Regular", 30, "This would be some form of in-game description");
 			label2.setParent(frame2, new GUILayoutSettingsAbsolute(0,0));
+			label2.getWidthMeasurement().setAbsolute(75);
 			
 			GUILabel label3 = new GUILabel("OpenSans-Regular", 30, "Goodbye");
 			label3.setParent(frame3, new GUILayoutSettingsAbsolute(0,0));

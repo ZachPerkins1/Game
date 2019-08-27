@@ -1,4 +1,5 @@
 #version 450
+#include "fragment_template.glsl"
 
 uniform sampler2D tex;
 in vec2 texCoord;
@@ -8,5 +9,8 @@ out vec4 FragColor;
 
 void main() {
 	// FragColor = texture(tex, texCoord);
-	FragColor = vec4(color.rgb, (texture(tex, texCoord).a) - (1 - color.a));
+	if (withinBounds())
+		FragColor = vec4(color.rgb, (texture(tex, texCoord).a) - (1 - color.a));
+	else
+		FragColor = vec4(0, 0, 0, 0);
 }

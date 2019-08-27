@@ -9,12 +9,12 @@ public class GUILayoutSettingsGrid extends GUILayoutSettings {
 		NEUTRAL
 	}
 	
-	int row;
-	int column;
-	int marginLeft;
-	int marginRight;
-	int marginTop;
-	int marginBottom;
+	public int row;
+	public int column;
+	public int marginLeft;
+	public int marginRight;
+	public int marginTop;
+	public int marginBottom;
 	
 	Sticky floatX;
 	Sticky floatY;

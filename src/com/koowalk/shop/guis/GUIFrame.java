@@ -3,15 +3,23 @@ package com.koowalk.shop.guis;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Comparator;
 
 import com.koowalk.shop.guis.GUITypeIdentifier;
 import com.koowalk.shop.util.Dim;
 
 public class GUIFrame extends GUIComponent {
-	public ArrayList<GUIComponent> children;
+	private static class ZIndexSorter implements Comparator<GUIComponent> {
+		@Override
+		public int compare(GUIComponent arg0, GUIComponent arg1) {
+			return arg0.getZIndex() - arg1.getZIndex();
+		}	
+	}
+	
+	public LinkedList<GUIComponent> children;
 	private Color color;
-	private DimensionMeasurement width;
-	private DimensionMeasurement height;
 	
 	private GUILayout layoutManager;
 	
@@ -30,27 +38,58 @@ public class GUIFrame extends GUIComponent {
 	public GUIFrame(GUILayout manager, Color color) {
 		super(GUITypeIdentifier.TYPE_FRAME);
 		this.color = color;
-		children = new ArrayList<GUIComponent>();
+		children = new LinkedList<GUIComponent>();
+		manager.setParentBounds(getWidthMeasurement(), getHeightMeasurement());
 		layoutManager = manager;
-		width = new DimensionMeasurement();
-		height = new DimensionMeasurement();
 	}
 	
 	public void add(GUIComponent component, GUILayoutSettings settings) {
 		children.add(component);
 		layoutManager.add(component, settings);
+		children.sort(new ZIndexSorter());
 	}
 	
-	public ArrayList<GUIComponent> getChildren() {
+	public void reorderChild(GUIComponent child) {
+		children.remove(child);
+		children.add(child);
+		children.sort(new ZIndexSorter());
+	}
+	
+	public void sendToTop(GUIComponent child) {
+		children.remove(child);
+		child.zindex = children.getLast().zindex + 1;
+		children.add(child);
+	}
+	
+	public void sendToBottom(GUIComponent child) {
+		children.remove(child);
+		child.zindex = children.getFirst().zindex - 1;
+		children.addFirst(child);
+	}
+	
+	@Override
+	public GUIComponent processClick(int x, int y) {
+		GUIComponent target = this;
+		
+		for (GUIComponent c : children) {
+			if (c.intersectsClick(x, y)) {
+				target = c.processClick(x, y);
+			}
+		}
+		
+		return target;
+	}
+	
+	public List<GUIComponent> getChildren() {
 		return children;
-	}
-	
-	public Dimension getChildAlottedDimensions(GUIComponent child) {
-		return null;
 	}
 	
 	public void setLayoutManager(GUILayout manager) {
 		layoutManager = manager;
+	}
+	
+	public GUILayout getLayoutManager() {
+		return layoutManager;
 	}
 	
 	public void update() {
@@ -59,51 +98,19 @@ public class GUIFrame extends GUIComponent {
 		}
 		
 		layoutManager.update();
+		this.getWidthMeasurement().setAuto(layoutManager.getBoundingWidth());
+		this.getHeightMeasurement().setAuto(layoutManager.getBoundingHeight());
+	}
+	
+	public void place() {
+		for (GUIComponent child : children) {
+			child.place();
+		}
+		
+		layoutManager.place();
 	}
 	
 	public Color getColor() {
 		return color;
-	}
-	
-	public int getWidth() {
-		return getDimension(Dim.X);
-	}
-	
-	public int getHeight() {
-		return getDimension(Dim.Y);
-	}
-	
-	private int getDimension(Dim d) {
-		DimensionMeasurement m = getDimensionMeasurementByDim(d);
-		
-		if (m.getMode() == DimensionMeasurement.Mode.AUTO) {
-			return layoutManager.getBoundingByDim(d);
-		} else if (m.getMode() == DimensionMeasurement.Mode.RELATIVE) {
-			if (getParent().getDimensionMeasurementByDim(d).getMode() == DimensionMeasurement.Mode.AUTO) {
-				return 0;
-			} else {
-				return m.get(getParent().getDimensionByDim(d));
-			}
-		} else {
-			return m.get();
-		}
-	}
-	
-	public DimensionMeasurement getWidthMeasurement() {
-		return width;
-	}
-	
-	public DimensionMeasurement getHeightMeasurement() {
-		return height;
-	}
-	
-	public DimensionMeasurement getDimensionMeasurementByDim(Dim d) {
-		if (d == Dim.X) {
-			return getWidthMeasurement();
-		} else if (d == Dim.Y) {
-			return getHeightMeasurement();
-		}
-		
-		return null;
 	}
 }

@@ -5,13 +5,17 @@ import java.io.IOException;
 
 import com.koowalk.shop.graphics.Font;
 import com.koowalk.shop.graphics.FontLoader;
+import com.koowalk.shop.guis.dimension.DimensionMeasurement.Mode;
 
 public class GUILabel extends GUIComponent {
 	private Font font;
 	private String text;
 	private Color color;
+	private	int lineSpacing;
+	private Font.FontRenderTarget renderTarget;
 	
 	private int width;
+	private int height;
 	
 	public GUILabel(Font font, String text, Color color) {
 		super(GUITypeIdentifier.TYPE_LABEL);
@@ -52,20 +56,47 @@ public class GUILabel extends GUIComponent {
 		return getText();
 	}
 	
+	public Font.FontRenderTarget getRenderTarget() {
+		return renderTarget;
+	}
+	
 	public void setText(String text) {
-		width = font.getWidth(text);
 		this.text = text;
+		recalculateRenderTarget();
+	}
+	
+	public void setColor(Color c) {
+		this.color = c;
 	}
 	
 	public int getVertexCount() {
 		return text.length() * 6;
 	}
 	
-	public int getWidth() {
-		return width;
+	@Override
+	public void update() {
+		this.getWidthMeasurement().setAuto(width);
+		this.getHeightMeasurement().setAuto(height);
 	}
 	
-	public int getHeight() {
-		return font.getHeight();
+	@Override
+	public void place() {
+		if (getWidthMeasurement().get() != width) {
+			recalculateRenderTarget();
+		}
+		
+		this.getHeightMeasurement().setAuto(height);
+	}
+	
+	private void recalculateRenderTarget() {
+		updated	= true;
+		int wrapWidth = -1;
+		if (getWidthMeasurement().getMode() != Mode.AUTO) {
+			wrapWidth = getWidthMeasurement().get();
+		}
+		
+		renderTarget = font.getRenderTarget(text, wrapWidth, lineSpacing);
+		width = renderTarget.getBoundingWidth();
+		height = renderTarget.getBoundingHeight();
 	}
 }
