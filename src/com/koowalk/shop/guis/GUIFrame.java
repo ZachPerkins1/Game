@@ -69,7 +69,7 @@ public class GUIFrame extends GUIComponent {
 	
 	@Override
 	public GUIComponent processClick(int x, int y) {
-		GUIComponent target = null;
+		GUIComponent target = this;
 		
 		for (GUIComponent c : children) {
 			if (c.intersectsClick(x, y)) {

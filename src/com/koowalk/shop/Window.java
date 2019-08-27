@@ -116,8 +116,10 @@ public class Window {
 			double[] y = new double[1];
  			glfwGetCursorPos(window, x, y);
  			
- 			if (action == GLFW_PRESS)
- 				game.mouseClicked(button, x[0], y[0]);
+ 			if (action == GLFW_PRESS) {
+ 				if (!GUIManager.getInstance().processClick((int)x[0], (int)y[0]))
+ 					game.mouseClicked(button, x[0], y[0]);
+ 			}
 		});
 
 		try ( MemoryStack stack = stackPush() ) {
@@ -173,7 +175,7 @@ public class Window {
 		}
 		
 		try {
-			GUILabel label = new GUILabel("OpenSans-Regular", 60, "Test");
+			GUILabel label = new GUILabel("OpenSans-Regular", 100, "Test");
 			label.setColor(Color.BLACK);
 			label.setParent(frame, new GUILayoutSettingsAbsolute(30, 0));
 			new GUILabel("OpenSans-Regular", 60, "Hello").setParent(frame, new GUILayoutSettingsAbsolute(30, 0));

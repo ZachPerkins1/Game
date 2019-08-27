@@ -51,7 +51,7 @@ public class GUIManager {
 	
 	public boolean processClick(int x, int y) {
 		GUIComponent clicked = master.processClick(x, y);
-		if (clicked != null) {
+		if (clicked != null && !clicked.equals(master)) {
 			// Return the relative position of the click
 			clicked.onClick(x - clicked.getX(), y - clicked.getY());
 			return true;
