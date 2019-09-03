@@ -28,7 +28,7 @@ public class Game {
 		movement = new boolean[4];
 		
 		Logger.info("Loading world file");
-		GameFile g = new GameFile("test");
+		GameFile g = new GameFile("hello");
 		world = new World(g.getMap());
 		
 		Logger.info("Loading player");

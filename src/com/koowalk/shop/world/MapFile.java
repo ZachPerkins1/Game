@@ -5,6 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.koowalk.shop.util.Logger;
 import com.koowalk.shop.util.Point2D;
@@ -22,10 +27,12 @@ public class MapFile {
 	private Connection mapDB;
 	private Connection entityDB;
 	
-	private SortedArrayList<SortedPoint2D> chunkInfo;
+	private ThreadPoolExecutor executor;
+	
+	private Set<ChunkInfo> chunkInfo;
 	
 	public MapFile(File save) {
-		chunkInfo = new SortedArrayList<SortedPoint2D>();
+		chunkInfo = new HashSet<ChunkInfo>();
 		
 		try {
 			mapDB = DriverManager.getConnection("jdbc:sqlite:" + save.toString() + "/" + MAP_NAME);
@@ -45,6 +52,8 @@ public class MapFile {
 			Logger.error("Failed to open map db");
 			Logger.exception(e);
 		}
+		
+		// executor = (ThreadPoolExecutor) Executors.newSingleThreadExecutor();
 	}
 	
 	private void setDefaults(Connection conn) {
@@ -75,14 +84,14 @@ public class MapFile {
 		PreparedStatement s = mapDB.prepareStatement("SELECT * FROM blocks WHERE chunk_x=? AND chunk_y=?");
 		s.setInt(1, x);
 		s.setInt(2, y);
-		
 		ResultSet r = s.executeQuery();
+		
 		ChunkInfo info = new ChunkInfo(x, y);
 		
 		while (r.next()) {
 			info.add(new BlockInfo(new Block(r.getInt("id"), r.getInt("sub_id")), r.getInt("block_x"), r.getInt("block_y"), r.getInt("block_layer")));
 		}
-		
+				
 		s.close();
 		return info;
 	}
@@ -121,45 +130,46 @@ public class MapFile {
 		s.executeUpdate();
 	}
 	
-	// Ugh
 	public void saveChunk(Chunk c) throws SQLException {
-		ChunkInfo ci = (ChunkInfo) chunkInfo.find(new Point2D(c.x, c.y)); 
+		ChunkInfo ci = (ChunkInfo) chunkInfo.(new Point2D(c.x, c.y)); 
 		if (ci == null) {
 			ci = new ChunkInfo(c.x, c.y);
 		}
+		
+		ChunkInfo newCi = new ChunkInfo(c.x, c.y);
 				
+		// Compare every block to that currently in the database and make changes as necessary
 		for (int x = 0; x < Chunk.SIZE; x++) {
 			for (int y = 0; y < Chunk.SIZE; y++) {
 				for (int l = 0; l < Chunk.LAYERS; l++) {
-					Block b = c.blockAt(l, x, y);
-					
-					// If we need to do anything to the block
-					if (!b.isAir()) {
-						BlockInfo noo = new BlockInfo(b, x, y, l); // The block info for the new block data affectionately named noo
-						BlockInfo bi = ci.getBlock(x, y, l);
-						
-						if (bi != null) {
-							if (bi.getBlock().equals(b)) {
-								// We need to update a pre-existing block
-								updateBlock(c.x, c.y, noo);
-							}
-							
-							ci.remove(bi);
-						} else {
-							// We need to add a new block to the database
-							addBlock(c.x, c.y, noo);
-						}
+					BlockInfo oldBlock = ci.getBlock(x, y, l);		
+					BlockInfo newBlock = new BlockInfo(c.blockAt(l, x, y), x, y, l);
+										
+					if (!newBlock.getBlock().isAir()) {
+						newCi.add(newBlock);
 					}
+
+					handleBlock(c.x, c.y, oldBlock, newBlock);
 				}
 			}
 		}
 		
-		// We want to delete all the left-over blocks in the list
-		for (int i = 0; i < ci.getBlockCount(); i++) {
-			deleteBlock(ci.getX(), ci.getY(), ci.get(i));
-		}
-		
 		chunkInfo.remove(ci);
+	}
+	
+	private void handleBlock(int cx, int cy, BlockInfo oldBlock, BlockInfo newBlock) throws SQLException {		
+		// If we need to do anything to the block	
+		
+		if ((oldBlock != null && !newBlock.equals(oldBlock)) 
+				|| (!newBlock.getBlock().isAir() && oldBlock == null)) {
+			System.out.println(oldBlock + " | " + newBlock);
+			if (newBlock.getBlock().isAir()) 
+				deleteBlock(cx, cy, oldBlock);
+			else if (oldBlock == null || oldBlock.getBlock().isAir())
+				addBlock(cx, cy, newBlock);
+			else
+				updateBlock(cx, cy, newBlock);
+		}
 	}
 	
 	public void loadChunk(Chunk c) throws SQLException {

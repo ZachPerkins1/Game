@@ -18,4 +18,8 @@ public abstract class SortedPoint3D extends SortedPoint2D {
 			return result;
 		}
 	}
+	
+	public boolean equals(SortedPoint3D point) {
+		return compareTo(point) == 0;
+	}
 }

@@ -1,6 +1,7 @@
 package com.koowalk.shop.world.chunk;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import com.koowalk.shop.util.Point3D;
 import com.koowalk.shop.util.SortedArrayList;
@@ -62,5 +63,9 @@ public class ChunkInfo extends SortedPoint2D {
 	
 	public String toString() {
 		return blocks.toString();
+	}
+	
+	public int hashCode() {
+		return Objects.hash(cx, cy);
 	}
 }

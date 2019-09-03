@@ -8,6 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import com.koowalk.shop.Statics;
 import com.koowalk.shop.Util;
@@ -34,6 +38,8 @@ public class World {
 	private MapFile file;
 	
 	private int counter = 0;
+	
+	Set<Chunk> editedChunks;
 		
 	public World(MapFile file) {
 		this.file = file;
@@ -49,6 +55,8 @@ public class World {
 		cam.setCenter(0, 0);
 		
 		ChunkRenderEngine.getInstance().setCamera(cam);
+		
+		editedChunks = new HashSet<Chunk>();
 	}
 	
 	private void loadBlocks() {
@@ -77,27 +85,26 @@ public class World {
 	private Chunk getChunk(int x, int y) {
 		Chunk c = chunks.at(x, y);
 		
-		if (c != null)
-			return c; // Oh cool we don't need to do any work
-		
-		c = new Chunk(this, x, y);
-		
-		try {
-			file.loadChunk(c);
-		} catch (SQLException e) {
-			Logger.warn("No data found for chunk (" + c.x + ", " + c.y + ")");
+		if (c == null) {		
+			c = new Chunk(this, x, y);
+			
+			try {
+				file.loadChunk(c);
+			} catch (SQLException e) {
+				Logger.warn("No data found for chunk (" + c.x + ", " + c.y + ")");
+			}
+			
+			chunks.addSorted(c);
 		}
 		
-		chunks.addSorted(c);
 		return c;
 	}
 	
 	// Unload and save all the currently loaded chunks
 	public void saveChunks() {
+		Logger.info(editedChunks);
 		Logger.info("Saving world");
-		for (SortedPoint2D c : chunks) {
-			Chunk chunk = (Chunk) c;
-			
+		for (Chunk chunk : editedChunks) {			
 			try {
 				file.saveChunk(chunk);
 			} catch (SQLException e) {
@@ -117,6 +124,8 @@ public class World {
 				
 		Chunk chunk = getChunk(c.x, c.y);
 		chunk.place(ox, oy, id);
+		
+		editedChunks.add(chunk);
 	}
 	
 	public Block blockAt(int x, int y) {
@@ -283,7 +292,7 @@ public class World {
 			((Chunk)c).update();
 		}
 		
-		if (counter == 60*60) {
+		if (counter == 10*60) {
 			saveChunks();
 			counter = 0;
 		}
