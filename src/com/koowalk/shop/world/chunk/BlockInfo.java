@@ -7,12 +7,26 @@ public class BlockInfo extends SortedPoint3D {
 	private int x;
 	private int y;
 	private int layer;
+	
+	private int cx;
+	private int cy;
 		
-	public BlockInfo(Block b, int x, int y, int layer) {
+	public BlockInfo(int cx, int cy, int x, int y, int layer, Block b) {
+		this.cx = cx;
+		this.cy = cy;
+		
 		this.x = x;
 		this.y = y;
 		this.layer = layer;
 		this.b = b;
+	}
+	
+	public int getChunkX() {
+		return cx;
+	}
+	
+	public int getChunkY() {
+		return cy;
 	}
 	
 	public int getX() {

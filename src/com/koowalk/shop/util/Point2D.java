@@ -1,5 +1,7 @@
 package com.koowalk.shop.util;
 
+import java.util.Objects;
+
 public class Point2D extends SortedPoint2D {
 	private int x;
 	private int y;
@@ -23,5 +25,10 @@ public class Point2D extends SortedPoint2D {
 	
 	public int getY() {
 		return y;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y);
 	}
 }

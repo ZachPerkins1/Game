@@ -29,10 +29,10 @@ public class MapFile {
 	
 	private ThreadPoolExecutor executor;
 	
-	private Set<ChunkInfo> chunkInfo;
+	private BlockTracker blockTracker;
 	
 	public MapFile(File save) {
-		chunkInfo = new HashSet<ChunkInfo>();
+		blockTracker = new BlockTracker();
 		
 		try {
 			mapDB = DriverManager.getConnection("jdbc:sqlite:" + save.toString() + "/" + MAP_NAME);

@@ -1,5 +1,7 @@
 package com.koowalk.shop.util;
 
+import java.util.Objects;
+
 public class Point3D extends SortedPoint3D {
 	private int x;
 	private int y;
@@ -33,5 +35,10 @@ public class Point3D extends SortedPoint3D {
 	
 	public void setZ(int z) {
 		this.z = z;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y, z);
 	}
 }
