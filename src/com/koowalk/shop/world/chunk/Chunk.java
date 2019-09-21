@@ -59,6 +59,10 @@ public class Chunk extends SortedPoint2D {
 		}
 	}
 	
+	public void place(int x, int y, Block b) {
+		place(FOREGROUND, x, y, b);
+	}
+	
 	public void place(int x, int y, int id) {
 		place(FOREGROUND, x, y, id);
 	}
@@ -67,12 +71,20 @@ public class Chunk extends SortedPoint2D {
 		place(layer, x, y, new Block(id));
 	}
 	
+	public void place(BlockInfo b) {
+		place(b.getLayer(), b.getX(), b.getY(), b.getBlock());
+	}
+	
 	public Block blockAt(int layer, int x, int y) {
 		try {
 			return blocks[layer][x][y];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return new Block(1);
 		}
+	}
+	
+	public BlockInfo blockInfoAt(int layer, int x, int y) {
+		return new BlockInfo(this.x, this.y, x, y, layer, blockAt(layer, x, y));
 	}
 	
 	public Block blockAt(int x, int y) {

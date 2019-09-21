@@ -14,6 +14,13 @@ import com.koowalk.shop.world.chunk.BlockInfo;
  */
 
 public class BlockTracker {
+	public enum ChangeType {
+		NONE,
+		DELETE,
+		ADD,
+		UPDATE;
+	}
+	
 	/**
 	 * A class which contains the information in a single chunk, i.e. which blocks
 	 * are where. Only used internally in BlockTracker to optimize performance.
@@ -56,7 +63,10 @@ public class BlockTracker {
 	}
 	
 	public ChunkInfo addChunk(int x, int y) {
-		return chunks.put(new Point2D(x, y), new ChunkInfo());
+		ChunkInfo ci = new ChunkInfo();
+		final Point2D p = new Point2D(x, y);
+		chunks.put(p, ci);
+		return ci;
 	}
 	
 	public ChunkInfo removeChunk(int x, int y) {
@@ -81,16 +91,16 @@ public class BlockTracker {
 		int cx = b.getChunkX();
 		int cy = b.getChunkY();
 		
-		if (new Point2D(cx, cy).equals(mostRecentCoordinates)) {
+		if (mostRecentCoordinates != null && new Point2D(cx, cy).equals(mostRecentCoordinates)) {
 			chunk = mostRecentChunk;
 		} else if (hasChunk(cx, cy)) {
 			chunk = getChunk(cx, cy);
 		} else {
 			chunk = addChunk(cx, cy);
 		}
-		
+			
 		chunk.setBlock(b);
-		
+				
 		if (chunk.isEmpty()) {
 			removeChunk(cx, cy);
 		}
@@ -108,14 +118,14 @@ public class BlockTracker {
 	public BlockInfo blockAt(int cx, int cy, int bx, int by, int layer) {
 		ChunkInfo chunk = null;
 		
-		if (new Point2D(cx, cy).equals(mostRecentCoordinates)) {
+		if (mostRecentCoordinates != null && new Point2D(cx, cy).equals(mostRecentCoordinates)) {
 			chunk = mostRecentChunk;
 		} else if (hasChunk(cx, cy)) {
 			chunk = getChunk(cx, cy);
 		} else {
 			return new BlockInfo(cx, cy, bx, by, layer, new Block(0));
 		}
-		
+				
 		return new BlockInfo(cx, cy, bx, by, layer, chunk.blockAt(bx, by, layer));
 	}
 	
@@ -128,4 +138,27 @@ public class BlockTracker {
 	public BlockInfo blockAt(BlockInfo b) {
 		return blockAt(b.getChunkX(), b.getChunkY(), b.getX(), b.getY(), b.getLayer());
 	}
+	
+	public ChangeType changeBlock(BlockInfo b) {
+		BlockInfo oldB = blockAt(b);
+		
+		
+		if (oldB.getBlock().equals(b.getBlock())) {
+			return ChangeType.NONE;
+		} else {
+			addBlock(b);
+			if (oldB.getBlock().isAir())
+				return ChangeType.ADD;
+			else if (b.getBlock().isAir())
+				return ChangeType.DELETE;
+			
+			return ChangeType.UPDATE;
+		}
+	}
+	
+	public static void main(String[] args) {
+		BlockTracker b = new BlockTracker();
+		b.addBlock(new BlockInfo(0, 0, 1, 1, 0, new Block(1)));
+	}
 }
+

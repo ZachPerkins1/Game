@@ -89,6 +89,7 @@ public class World {
 			c = new Chunk(this, x, y);
 			
 			try {
+				Logger.infov("Loading chunk at (" + c.x + ", " + c.y + ")");
 				file.loadChunk(c);
 			} catch (SQLException e) {
 				Logger.warn("No data found for chunk (" + c.x + ", " + c.y + ")");

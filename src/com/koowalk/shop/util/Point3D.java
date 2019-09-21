@@ -41,4 +41,9 @@ public class Point3D extends SortedPoint3D {
 	public int hashCode() {
 		return Objects.hash(x, y, z);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return this.hashCode() == other.hashCode();
+	}
 }

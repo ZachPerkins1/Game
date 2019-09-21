@@ -18,7 +18,6 @@ import com.koowalk.shop.util.SortedPoint2D;
 import com.koowalk.shop.world.chunk.Block;
 import com.koowalk.shop.world.chunk.BlockInfo;
 import com.koowalk.shop.world.chunk.Chunk;
-import com.koowalk.shop.world.chunk.ChunkInfo;
 
 public class MapFile {
 	public static final String MAP_NAME = "map";
@@ -80,48 +79,51 @@ public class MapFile {
 		statement.close();
 	}
 	
-	public ChunkInfo getChunkData(int x, int y) throws SQLException {
+	public void loadChunkData(int x, int y) throws SQLException {
+		Logger.infov("Loading data for chunk at (" + x + ", " + y + ")");
 		PreparedStatement s = mapDB.prepareStatement("SELECT * FROM blocks WHERE chunk_x=? AND chunk_y=?");
 		s.setInt(1, x);
 		s.setInt(2, y);
 		ResultSet r = s.executeQuery();
 		
-		ChunkInfo info = new ChunkInfo(x, y);
+		int n = 0;
 		
 		while (r.next()) {
-			info.add(new BlockInfo(new Block(r.getInt("id"), r.getInt("sub_id")), r.getInt("block_x"), r.getInt("block_y"), r.getInt("block_layer")));
+			n++;
+			blockTracker.changeBlock(new BlockInfo(x, y, r.getInt("block_x"), r.getInt("block_y"), r.getInt("block_layer"), new Block(r.getInt("id"), r.getInt("sub_id"))));
 		}
+		
+		Logger.infov("Loaded " + n + " blocks");
 				
 		s.close();
-		return info;
 	}
 	
-	private void updateBlock(int cx, int cy, BlockInfo b) throws SQLException {
+	private void updateBlock(BlockInfo b) throws SQLException {
 		PreparedStatement s = mapDB.prepareStatement("UPDATE blocks SET id=?, sub_id=? WHERE chunk_x=? AND chunk_y=? AND block_x=? AND block_y=? AND block_layer=?");
 		s.setInt(1, b.getBlock().getID());
 		s.setInt(2, b.getBlock().getSubID());
-		s.setInt(3, cx);
-		s.setInt(4, cy);
+		s.setInt(3, b.getChunkX());
+		s.setInt(4, b.getChunkY());
 		s.setInt(5, b.getX());
 		s.setInt(6, b.getY());
 		s.setInt(7, b.getLayer());
 		s.executeUpdate();
 	}
 	
-	private void deleteBlock(int cx, int cy, BlockInfo b) throws SQLException {
+	private void deleteBlock(BlockInfo b) throws SQLException {
 		PreparedStatement s = mapDB.prepareStatement("DELETE FROM blocks WHERE chunk_x=? AND chunk_y=? AND block_x = ? AND block_y = ? AND block_layer = ?");
-		s.setInt(1, cx);
-		s.setInt(2, cy);
+		s.setInt(1, b.getChunkX());
+		s.setInt(2, b.getChunkY());
 		s.setInt(3, b.getX());
 		s.setInt(4, b.getY());
 		s.setInt(5, b.getLayer());
 		s.executeUpdate();
 	}
 	
-	private void addBlock(int cx, int cy, BlockInfo b) throws SQLException {
+	private void addBlock(BlockInfo b) throws SQLException {
 		PreparedStatement s = mapDB.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?)");
-		s.setInt(1, cx);
-		s.setInt(2, cy);
+		s.setInt(1, b.getChunkX());
+		s.setInt(2, b.getChunkY());
 		s.setInt(3, b.getX());
 		s.setInt(4, b.getY());
 		s.setInt(5, b.getLayer());
@@ -131,54 +133,40 @@ public class MapFile {
 	}
 	
 	public void saveChunk(Chunk c) throws SQLException {
-		ChunkInfo ci = (ChunkInfo) chunkInfo.(new Point2D(c.x, c.y)); 
-		if (ci == null) {
-			ci = new ChunkInfo(c.x, c.y);
-		}
-		
-		ChunkInfo newCi = new ChunkInfo(c.x, c.y);
-				
 		// Compare every block to that currently in the database and make changes as necessary
 		for (int x = 0; x < Chunk.SIZE; x++) {
 			for (int y = 0; y < Chunk.SIZE; y++) {
 				for (int l = 0; l < Chunk.LAYERS; l++) {
-					BlockInfo oldBlock = ci.getBlock(x, y, l);		
-					BlockInfo newBlock = new BlockInfo(c.blockAt(l, x, y), x, y, l);
-										
-					if (!newBlock.getBlock().isAir()) {
-						newCi.add(newBlock);
+					
+					BlockInfo currBlock = c.blockInfoAt(l, x, y);
+					BlockTracker.ChangeType change = blockTracker.changeBlock(currBlock);
+					
+					
+					if (change.equals(BlockTracker.ChangeType.ADD)) {
+						addBlock(currBlock);
+					} else if (change.equals(BlockTracker.ChangeType.DELETE)) {
+						deleteBlock(currBlock);
+					} else if (change.equals(BlockTracker.ChangeType.UPDATE)) {
+						updateBlock(currBlock);
 					}
-
-					handleBlock(c.x, c.y, oldBlock, newBlock);
 				}
 			}
-		}
-		
-		chunkInfo.remove(ci);
-	}
-	
-	private void handleBlock(int cx, int cy, BlockInfo oldBlock, BlockInfo newBlock) throws SQLException {		
-		// If we need to do anything to the block	
-		
-		if ((oldBlock != null && !newBlock.equals(oldBlock)) 
-				|| (!newBlock.getBlock().isAir() && oldBlock == null)) {
-			System.out.println(oldBlock + " | " + newBlock);
-			if (newBlock.getBlock().isAir()) 
-				deleteBlock(cx, cy, oldBlock);
-			else if (oldBlock == null || oldBlock.getBlock().isAir())
-				addBlock(cx, cy, newBlock);
-			else
-				updateBlock(cx, cy, newBlock);
 		}
 	}
 	
 	public void loadChunk(Chunk c) throws SQLException {
-		ChunkInfo ci = getChunkData(c.x, c.y);
-		chunkInfo.addSorted(ci);
-				
-		for (int i = 0; i < ci.getBlockCount(); i++) {
-			BlockInfo bi = ci.get(i);
-			c.place(bi.getLayer(), bi.getX(), bi.getY(), bi.getBlock());
+		loadChunkData(c.getX(), c.getY());
+		
+		for (int x = 0; x < Chunk.SIZE; x++) {
+			for (int y = 0; y < Chunk.SIZE; y++) {
+				for (int l = 0; l < Chunk.LAYERS; l++) {
+					BlockInfo b = blockTracker.blockAt(c.getX(), c.getY(), x, y, l);
+					c.place(b);
+					if (!b.getBlock().isAir()) {
+						Logger.infov("Placing block ID " + b.getBlock().getID());
+					}
+				}
+			}
 		}
 	}
 }

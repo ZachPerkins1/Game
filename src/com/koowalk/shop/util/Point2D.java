@@ -31,4 +31,12 @@ public class Point2D extends SortedPoint2D {
 	public int hashCode() {
 		return Objects.hash(x, y);
 	}
+	
+	public boolean equals(Object other) {
+		return this.hashCode() == other.hashCode();
+	}
+	
+	public String toString() {
+		return "(" + x + ", " + y + ")";
+	}
 }

@@ -16,12 +16,26 @@ public class Logger {
 	public static final int BUFFER_CAPACITY = 200;
 	public static final String LOG_FOLDER = "logs";
 	
+	public static final boolean VERBOSE = true;
+	
 	private static PrintWriter writer;
 	private static StringBuilder buffer;	
 	private static int messageCount;
 	
 	private static DateTimeFormatter formatter;
-		
+	
+	public static void infov(Object o) {
+		if (VERBOSE) info(o);
+	}
+	
+	public static void errorv(Object o) {
+		if (VERBOSE) error(o);
+	}
+	
+	public static void warnv(Object o) {
+		if (VERBOSE) warn(o);
+	}
+	
 	public static void info(Object o) {
 		print("[INFO] " + o.toString());
 	}
@@ -82,6 +96,8 @@ public class Logger {
 		}
 		
 		createFormatter();
+		
+		infov("Logger is " + (VERBOSE? "in": "not in") + " verbose mode");
 	}
 	
 	public static void finish() {
