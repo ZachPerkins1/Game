@@ -1,4 +1,6 @@
 package com.koowalk.shop.world.chunk;
+import java.util.Arrays;
+
 import com.koowalk.shop.graphics.ChunkRenderEngine;
 import com.koowalk.shop.util.SortedPoint2D;
 import com.koowalk.shop.world.World;
@@ -125,5 +127,19 @@ public class Chunk extends SortedPoint2D {
 	@Override
 	public int getY() {
 		return y;
+	}
+	
+	public Chunk copy() {
+		Chunk c = new Chunk(world, x, y);
+		c.blocks = new Block[LAYERS][SIZE][SIZE];
+		for (int layer = 0; layer < LAYERS; layer++) {
+			for (int cx = 0; cx < SIZE; cx++) {
+				for (int cy = 0; cy < SIZE; cy++) {
+					c.blocks[layer][cx][cy] = blocks[layer][cx][cy];
+				}
+			}
+		}
+		
+		return c;
 	}
 }
